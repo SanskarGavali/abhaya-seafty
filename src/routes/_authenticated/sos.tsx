@@ -110,11 +110,12 @@ function SosPage() {
     await supabase.from("incident_reports").insert({
       user_id: uid,
       category: "sos",
-      title: "SOS Triggered",
       description: "Emergency SOS activated from device.",
       latitude: lat,
       longitude: lng,
       status: "active",
+      is_emergency: true,
+      submitted_at: new Date().toISOString(),
     });
   };
 
