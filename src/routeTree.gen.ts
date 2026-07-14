@@ -14,13 +14,22 @@ import { Route as LanguageRouteImport } from './routes/language'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/sos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedLiveLocationRouteImport } from './routes/_authenticated/live-location'
 import { Route as AuthenticatedLearnRouteImport } from './routes/_authenticated/learn'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticated/helpline'
+import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
+import { Route as AuthenticatedFollowingMeRouteImport } from './routes/_authenticated/following-me'
+import { Route as AuthenticatedDomesticViolenceRouteImport } from './routes/_authenticated/domestic-violence'
+import { Route as AuthenticatedCyberSafetyRouteImport } from './routes/_authenticated/cyber-safety'
+import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
+import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -46,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
+  id: '/sos',
+  path: '/sos',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -73,6 +87,12 @@ const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
   path: '/map',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLiveLocationRoute =
+  AuthenticatedLiveLocationRouteImport.update({
+    id: '/live-location',
+    path: '/live-location',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
   id: '/learn',
   path: '/learn',
@@ -81,6 +101,44 @@ const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHelplineRoute = AuthenticatedHelplineRouteImport.update({
+  id: '/helpline',
+  path: '/helpline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHarassmentRoute = AuthenticatedHarassmentRouteImport.update({
+  id: '/harassment',
+  path: '/harassment',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFollowingMeRoute =
+  AuthenticatedFollowingMeRouteImport.update({
+    id: '/following-me',
+    path: '/following-me',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDomesticViolenceRoute =
+  AuthenticatedDomesticViolenceRouteImport.update({
+    id: '/domestic-violence',
+    path: '/domestic-violence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCyberSafetyRoute =
+  AuthenticatedCyberSafetyRouteImport.update({
+    id: '/cyber-safety',
+    path: '/cyber-safety',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedContactsRoute = AuthenticatedContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
@@ -95,13 +153,22 @@ export interface FileRoutesByFullPath {
   '/language': typeof LanguageRoute
   '/onboarding': typeof OnboardingRoute
   '/about': typeof AuthenticatedAboutRoute
+  '/assistant': typeof AuthenticatedAssistantRoute
+  '/contacts': typeof AuthenticatedContactsRoute
+  '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
+  '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/following-me': typeof AuthenticatedFollowingMeRoute
+  '/harassment': typeof AuthenticatedHarassmentRoute
+  '/helpline': typeof AuthenticatedHelplineRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learn': typeof AuthenticatedLearnRoute
+  '/live-location': typeof AuthenticatedLiveLocationRoute
   '/map': typeof AuthenticatedMapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/sos': typeof AuthenticatedSosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,13 +176,22 @@ export interface FileRoutesByTo {
   '/language': typeof LanguageRoute
   '/onboarding': typeof OnboardingRoute
   '/about': typeof AuthenticatedAboutRoute
+  '/assistant': typeof AuthenticatedAssistantRoute
+  '/contacts': typeof AuthenticatedContactsRoute
+  '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
+  '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/following-me': typeof AuthenticatedFollowingMeRoute
+  '/harassment': typeof AuthenticatedHarassmentRoute
+  '/helpline': typeof AuthenticatedHelplineRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learn': typeof AuthenticatedLearnRoute
+  '/live-location': typeof AuthenticatedLiveLocationRoute
   '/map': typeof AuthenticatedMapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/sos': typeof AuthenticatedSosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,13 +201,22 @@ export interface FileRoutesById {
   '/language': typeof LanguageRoute
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/about': typeof AuthenticatedAboutRoute
+  '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
+  '/_authenticated/contacts': typeof AuthenticatedContactsRoute
+  '/_authenticated/cyber-safety': typeof AuthenticatedCyberSafetyRoute
+  '/_authenticated/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/_authenticated/following-me': typeof AuthenticatedFollowingMeRoute
+  '/_authenticated/harassment': typeof AuthenticatedHarassmentRoute
+  '/_authenticated/helpline': typeof AuthenticatedHelplineRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/learn': typeof AuthenticatedLearnRoute
+  '/_authenticated/live-location': typeof AuthenticatedLiveLocationRoute
   '/_authenticated/map': typeof AuthenticatedMapRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/report': typeof AuthenticatedReportRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/sos': typeof AuthenticatedSosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,13 +226,22 @@ export interface FileRouteTypes {
     | '/language'
     | '/onboarding'
     | '/about'
+    | '/assistant'
+    | '/contacts'
+    | '/cyber-safety'
+    | '/domestic-violence'
+    | '/following-me'
+    | '/harassment'
+    | '/helpline'
     | '/home'
     | '/learn'
+    | '/live-location'
     | '/map'
     | '/notifications'
     | '/profile'
     | '/report'
     | '/settings'
+    | '/sos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,13 +249,22 @@ export interface FileRouteTypes {
     | '/language'
     | '/onboarding'
     | '/about'
+    | '/assistant'
+    | '/contacts'
+    | '/cyber-safety'
+    | '/domestic-violence'
+    | '/following-me'
+    | '/harassment'
+    | '/helpline'
     | '/home'
     | '/learn'
+    | '/live-location'
     | '/map'
     | '/notifications'
     | '/profile'
     | '/report'
     | '/settings'
+    | '/sos'
   id:
     | '__root__'
     | '/'
@@ -170,13 +273,22 @@ export interface FileRouteTypes {
     | '/language'
     | '/onboarding'
     | '/_authenticated/about'
+    | '/_authenticated/assistant'
+    | '/_authenticated/contacts'
+    | '/_authenticated/cyber-safety'
+    | '/_authenticated/domestic-violence'
+    | '/_authenticated/following-me'
+    | '/_authenticated/harassment'
+    | '/_authenticated/helpline'
     | '/_authenticated/home'
     | '/_authenticated/learn'
+    | '/_authenticated/live-location'
     | '/_authenticated/map'
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/report'
     | '/_authenticated/settings'
+    | '/_authenticated/sos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/sos': {
+      id: '/_authenticated/sos'
+      path: '/sos'
+      fullPath: '/sos'
+      preLoaderRoute: typeof AuthenticatedSosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -259,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/live-location': {
+      id: '/_authenticated/live-location'
+      path: '/live-location'
+      fullPath: '/live-location'
+      preLoaderRoute: typeof AuthenticatedLiveLocationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/learn': {
       id: '/_authenticated/learn'
       path: '/learn'
@@ -273,6 +399,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/helpline': {
+      id: '/_authenticated/helpline'
+      path: '/helpline'
+      fullPath: '/helpline'
+      preLoaderRoute: typeof AuthenticatedHelplineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/harassment': {
+      id: '/_authenticated/harassment'
+      path: '/harassment'
+      fullPath: '/harassment'
+      preLoaderRoute: typeof AuthenticatedHarassmentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/following-me': {
+      id: '/_authenticated/following-me'
+      path: '/following-me'
+      fullPath: '/following-me'
+      preLoaderRoute: typeof AuthenticatedFollowingMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/domestic-violence': {
+      id: '/_authenticated/domestic-violence'
+      path: '/domestic-violence'
+      fullPath: '/domestic-violence'
+      preLoaderRoute: typeof AuthenticatedDomesticViolenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cyber-safety': {
+      id: '/_authenticated/cyber-safety'
+      path: '/cyber-safety'
+      fullPath: '/cyber-safety'
+      preLoaderRoute: typeof AuthenticatedCyberSafetyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contacts': {
+      id: '/_authenticated/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AuthenticatedContactsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/assistant': {
+      id: '/_authenticated/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AuthenticatedAssistantRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/about': {
       id: '/_authenticated/about'
       path: '/about'
@@ -285,24 +460,42 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
+  AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
+  AuthenticatedContactsRoute: typeof AuthenticatedContactsRoute
+  AuthenticatedCyberSafetyRoute: typeof AuthenticatedCyberSafetyRoute
+  AuthenticatedDomesticViolenceRoute: typeof AuthenticatedDomesticViolenceRoute
+  AuthenticatedFollowingMeRoute: typeof AuthenticatedFollowingMeRoute
+  AuthenticatedHarassmentRoute: typeof AuthenticatedHarassmentRoute
+  AuthenticatedHelplineRoute: typeof AuthenticatedHelplineRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLearnRoute: typeof AuthenticatedLearnRoute
+  AuthenticatedLiveLocationRoute: typeof AuthenticatedLiveLocationRoute
   AuthenticatedMapRoute: typeof AuthenticatedMapRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportRoute: typeof AuthenticatedReportRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSosRoute: typeof AuthenticatedSosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
+  AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
+  AuthenticatedContactsRoute: AuthenticatedContactsRoute,
+  AuthenticatedCyberSafetyRoute: AuthenticatedCyberSafetyRoute,
+  AuthenticatedDomesticViolenceRoute: AuthenticatedDomesticViolenceRoute,
+  AuthenticatedFollowingMeRoute: AuthenticatedFollowingMeRoute,
+  AuthenticatedHarassmentRoute: AuthenticatedHarassmentRoute,
+  AuthenticatedHelplineRoute: AuthenticatedHelplineRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLearnRoute: AuthenticatedLearnRoute,
+  AuthenticatedLiveLocationRoute: AuthenticatedLiveLocationRoute,
   AuthenticatedMapRoute: AuthenticatedMapRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportRoute: AuthenticatedReportRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSosRoute: AuthenticatedSosRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
