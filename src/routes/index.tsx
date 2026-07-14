@@ -1,24 +1,47 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { BrandLogo } from "@/components/app/BrandLogo";
+import { getStoredLanguage, useLanguage } from "@/hooks/use-language";
+import { t } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Splash,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Splash() {
+  const navigate = useNavigate();
+  const [lang] = useLanguage();
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const stored = getStoredLanguage();
+      const { data } = await supabase.auth.getSession();
+      if (!stored) {
+        navigate({ to: "/language" });
+      } else if (data.session) {
+        navigate({ to: "/home" });
+      } else {
+        navigate({ to: "/onboarding" });
+      }
+    }, 1600);
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-hero px-6">
+      <div className="pointer-events-none absolute -top-32 -left-24 h-72 w-72 rounded-full bg-brand/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -right-24 h-72 w-72 rounded-full bg-brand-pink/25 blur-3xl" />
+      <div className="animate-float-up flex flex-col items-center text-center">
+        <BrandLogo size="xl" showWord={false} />
+        <h1 className="mt-6 font-display text-6xl font-semibold" style={{ backgroundImage: "var(--gradient-brand)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+          Abhaya
+        </h1>
+        <p className="mt-3 text-sm font-medium tracking-wide text-brand">{t("tagline", lang)}</p>
+        <div className="mt-10 h-1 w-24 overflow-hidden rounded-full bg-brand-soft">
+          <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-brand" />
+        </div>
+      </div>
     </div>
   );
 }
