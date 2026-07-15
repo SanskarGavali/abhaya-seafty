@@ -37,7 +37,7 @@ function LearnPage() {
         </div>
 
         {items.map(({ to, icon: Icon, title, desc }) => (
-          <Link key={to} to={to} className="flex items-center gap-4 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60 hover:bg-brand-soft/40">
+          <Link key={to} to={to as never} className="flex items-center gap-4 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60 hover:bg-brand-soft/40">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-brand text-brand-foreground shadow-soft">
               <Icon className="h-6 w-6" />
             </div>
