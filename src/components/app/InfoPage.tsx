@@ -73,7 +73,7 @@ export function InfoPage({
                 </>
               );
               if (a.href) return <a key={a.label} href={a.href} className={cls}>{inner}</a>;
-              if (a.to) return <Link key={a.label} to={a.to} className={cls}>{inner}</Link>;
+              if (a.to) return <Link key={a.label} to={a.to as never} className={cls}>{inner}</Link>;
               return <div key={a.label} className={cls}>{inner}</div>;
             })}
           </section>
