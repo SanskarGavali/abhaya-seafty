@@ -1,19 +1,36 @@
-import { Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/abhaya-logo.jpeg.asset.json";
 
-export function BrandLogo({ size = "md", showWord = true }: { size?: "sm" | "md" | "lg" | "xl"; showWord?: boolean }) {
-  const shieldSize = { sm: "h-7 w-7", md: "h-9 w-9", lg: "h-14 w-14", xl: "h-24 w-24" }[size];
-  const iconSize = { sm: "h-4 w-4", md: "h-5 w-5", lg: "h-7 w-7", xl: "h-12 w-12" }[size];
-  const wordSize = { sm: "text-lg", md: "text-2xl", lg: "text-4xl", xl: "text-6xl" }[size];
+export function BrandLogo({
+  size = "md",
+  showWord = false,
+}: {
+  size?: "sm" | "md" | "lg" | "xl";
+  showWord?: boolean;
+}) {
+  const box = { sm: "h-8 w-8", md: "h-10 w-10", lg: "h-16 w-16", xl: "h-28 w-28" }[size];
+  const wordSize = { sm: "text-lg", md: "text-2xl", lg: "text-4xl", xl: "text-5xl" }[size];
   return (
     <div className="inline-flex items-center gap-2.5">
-      <div className={cn("relative flex items-center justify-center rounded-2xl bg-gradient-brand shadow-glow", shieldSize)}>
-        <Shield className={cn("text-brand-foreground", iconSize)} strokeWidth={2.5} fill="currentColor" fillOpacity={0.15} />
-      </div>
+      <img
+        src={logo.url}
+        alt="Abhaya"
+        width={size === "xl" ? 224 : size === "lg" ? 128 : size === "md" ? 80 : 64}
+        height={size === "xl" ? 224 : size === "lg" ? 128 : size === "md" ? 80 : 64}
+        loading="eager"
+        decoding="async"
+        className={cn("shrink-0 rounded-2xl object-contain", box)}
+        style={{ imageRendering: "auto" }}
+      />
       {showWord && (
         <span
           className={cn("font-display font-semibold tracking-tight", wordSize)}
-          style={{ backgroundImage: "var(--gradient-brand)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}
+          style={{
+            backgroundImage: "var(--gradient-brand)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+          }}
         >
           Abhaya
         </span>

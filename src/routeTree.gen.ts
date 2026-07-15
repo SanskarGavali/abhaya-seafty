@@ -14,8 +14,11 @@ import { Route as LanguageRouteImport } from './routes/language'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedZeroFirRouteImport } from './routes/_authenticated/zero-fir'
 import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/sos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSchemesRouteImport } from './routes/_authenticated/schemes'
+import { Route as AuthenticatedRightsRouteImport } from './routes/_authenticated/rights'
 import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -26,6 +29,7 @@ import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticated/helpline'
 import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
 import { Route as AuthenticatedFollowingMeRouteImport } from './routes/_authenticated/following-me'
+import { Route as AuthenticatedFaqRouteImport } from './routes/_authenticated/faq'
 import { Route as AuthenticatedDomesticViolenceRouteImport } from './routes/_authenticated/domestic-violence'
 import { Route as AuthenticatedCyberSafetyRouteImport } from './routes/_authenticated/cyber-safety'
 import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
@@ -56,6 +60,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedZeroFirRoute = AuthenticatedZeroFirRouteImport.update({
+  id: '/zero-fir',
+  path: '/zero-fir',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
   id: '/sos',
   path: '/sos',
@@ -64,6 +73,16 @@ const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSchemesRoute = AuthenticatedSchemesRouteImport.update({
+  id: '/schemes',
+  path: '/schemes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRightsRoute = AuthenticatedRightsRouteImport.update({
+  id: '/rights',
+  path: '/rights',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReportRoute = AuthenticatedReportRouteImport.update({
@@ -119,6 +138,11 @@ const AuthenticatedFollowingMeRoute =
     path: '/following-me',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFaqRoute = AuthenticatedFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDomesticViolenceRoute =
   AuthenticatedDomesticViolenceRouteImport.update({
     id: '/domestic-violence',
@@ -157,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof AuthenticatedContactsRoute
   '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/faq': typeof AuthenticatedFaqRoute
   '/following-me': typeof AuthenticatedFollowingMeRoute
   '/harassment': typeof AuthenticatedHarassmentRoute
   '/helpline': typeof AuthenticatedHelplineRoute
@@ -167,8 +192,11 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
+  '/rights': typeof AuthenticatedRightsRoute
+  '/schemes': typeof AuthenticatedSchemesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sos': typeof AuthenticatedSosRoute
+  '/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,6 +208,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof AuthenticatedContactsRoute
   '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/faq': typeof AuthenticatedFaqRoute
   '/following-me': typeof AuthenticatedFollowingMeRoute
   '/harassment': typeof AuthenticatedHarassmentRoute
   '/helpline': typeof AuthenticatedHelplineRoute
@@ -190,8 +219,11 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/report': typeof AuthenticatedReportRoute
+  '/rights': typeof AuthenticatedRightsRoute
+  '/schemes': typeof AuthenticatedSchemesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sos': typeof AuthenticatedSosRoute
+  '/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/contacts': typeof AuthenticatedContactsRoute
   '/_authenticated/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/_authenticated/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/_authenticated/faq': typeof AuthenticatedFaqRoute
   '/_authenticated/following-me': typeof AuthenticatedFollowingMeRoute
   '/_authenticated/harassment': typeof AuthenticatedHarassmentRoute
   '/_authenticated/helpline': typeof AuthenticatedHelplineRoute
@@ -215,8 +248,11 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/report': typeof AuthenticatedReportRoute
+  '/_authenticated/rights': typeof AuthenticatedRightsRoute
+  '/_authenticated/schemes': typeof AuthenticatedSchemesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/sos': typeof AuthenticatedSosRoute
+  '/_authenticated/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +266,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/cyber-safety'
     | '/domestic-violence'
+    | '/faq'
     | '/following-me'
     | '/harassment'
     | '/helpline'
@@ -240,8 +277,11 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/report'
+    | '/rights'
+    | '/schemes'
     | '/settings'
     | '/sos'
+    | '/zero-fir'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -253,6 +293,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/cyber-safety'
     | '/domestic-violence'
+    | '/faq'
     | '/following-me'
     | '/harassment'
     | '/helpline'
@@ -263,8 +304,11 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/report'
+    | '/rights'
+    | '/schemes'
     | '/settings'
     | '/sos'
+    | '/zero-fir'
   id:
     | '__root__'
     | '/'
@@ -277,6 +321,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contacts'
     | '/_authenticated/cyber-safety'
     | '/_authenticated/domestic-violence'
+    | '/_authenticated/faq'
     | '/_authenticated/following-me'
     | '/_authenticated/harassment'
     | '/_authenticated/helpline'
@@ -287,8 +332,11 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/report'
+    | '/_authenticated/rights'
+    | '/_authenticated/schemes'
     | '/_authenticated/settings'
     | '/_authenticated/sos'
+    | '/_authenticated/zero-fir'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -336,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/zero-fir': {
+      id: '/_authenticated/zero-fir'
+      path: '/zero-fir'
+      fullPath: '/zero-fir'
+      preLoaderRoute: typeof AuthenticatedZeroFirRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sos': {
       id: '/_authenticated/sos'
       path: '/sos'
@@ -348,6 +403,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/schemes': {
+      id: '/_authenticated/schemes'
+      path: '/schemes'
+      fullPath: '/schemes'
+      preLoaderRoute: typeof AuthenticatedSchemesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rights': {
+      id: '/_authenticated/rights'
+      path: '/rights'
+      fullPath: '/rights'
+      preLoaderRoute: typeof AuthenticatedRightsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/report': {
@@ -420,6 +489,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFollowingMeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/faq': {
+      id: '/_authenticated/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof AuthenticatedFaqRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/domestic-violence': {
       id: '/_authenticated/domestic-violence'
       path: '/domestic-violence'
@@ -464,6 +540,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContactsRoute: typeof AuthenticatedContactsRoute
   AuthenticatedCyberSafetyRoute: typeof AuthenticatedCyberSafetyRoute
   AuthenticatedDomesticViolenceRoute: typeof AuthenticatedDomesticViolenceRoute
+  AuthenticatedFaqRoute: typeof AuthenticatedFaqRoute
   AuthenticatedFollowingMeRoute: typeof AuthenticatedFollowingMeRoute
   AuthenticatedHarassmentRoute: typeof AuthenticatedHarassmentRoute
   AuthenticatedHelplineRoute: typeof AuthenticatedHelplineRoute
@@ -474,8 +551,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportRoute: typeof AuthenticatedReportRoute
+  AuthenticatedRightsRoute: typeof AuthenticatedRightsRoute
+  AuthenticatedSchemesRoute: typeof AuthenticatedSchemesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSosRoute: typeof AuthenticatedSosRoute
+  AuthenticatedZeroFirRoute: typeof AuthenticatedZeroFirRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -484,6 +564,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContactsRoute: AuthenticatedContactsRoute,
   AuthenticatedCyberSafetyRoute: AuthenticatedCyberSafetyRoute,
   AuthenticatedDomesticViolenceRoute: AuthenticatedDomesticViolenceRoute,
+  AuthenticatedFaqRoute: AuthenticatedFaqRoute,
   AuthenticatedFollowingMeRoute: AuthenticatedFollowingMeRoute,
   AuthenticatedHarassmentRoute: AuthenticatedHarassmentRoute,
   AuthenticatedHelplineRoute: AuthenticatedHelplineRoute,
@@ -494,8 +575,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportRoute: AuthenticatedReportRoute,
+  AuthenticatedRightsRoute: AuthenticatedRightsRoute,
+  AuthenticatedSchemesRoute: AuthenticatedSchemesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSosRoute: AuthenticatedSosRoute,
+  AuthenticatedZeroFirRoute: AuthenticatedZeroFirRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

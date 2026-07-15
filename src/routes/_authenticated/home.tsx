@@ -66,7 +66,7 @@ function HomePage() {
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold">{t("quickAccess", lang)}</h2>
-            <Link to="/home" className="text-xs font-medium text-brand hover:underline">{t("viewAll", lang)}</Link>
+            <Link to="/learn" className="text-xs font-medium text-brand hover:underline">{t("viewAll", lang)}</Link>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <TileCard to="/following-me" icon={HomeIcon} label={t("followingMe", lang)} tone="brand" />
