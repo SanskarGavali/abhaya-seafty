@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/app/BottomNav";
+import { PWAInstallPrompt } from "@/components/app/PWAInstallPrompt";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -17,6 +18,7 @@ function AuthedLayout() {
     <div className="min-h-screen bg-background pb-20">
       <Outlet />
       <BottomNav />
+      <PWAInstallPrompt />
     </div>
   );
 }

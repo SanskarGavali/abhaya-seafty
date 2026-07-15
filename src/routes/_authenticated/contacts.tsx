@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Phone, User, ArrowUp, ArrowDown, Pencil, X, Check } from "lucide-react";
+import { Plus, Trash2, Phone, User, ArrowUp, ArrowDown, Pencil, X, Check, Send } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/app/AppHeader";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { shareEmergency } from "@/lib/share";
 
 export const Route = createFileRoute("/_authenticated/contacts")({
   head: () => ({ meta: [{ title: "Emergency Contacts — Abhaya" }] }),
@@ -100,6 +101,30 @@ function ContactsPage() {
         <Button variant="brand" size="lg" className="w-full" onClick={() => { setEditing(null); setShowForm(true); }}>
           <Plus className="h-5 w-5" /> Add contact
         </Button>
+
+        {contacts.length > 0 && (
+          <Button
+            variant="emergency"
+            size="lg"
+            className="w-full"
+            onClick={async () => {
+              const pos = await new Promise<{ lat: number; lng: number; accuracy: number } | null>((res) => {
+                if (!navigator.geolocation) return res(null);
+                navigator.geolocation.getCurrentPosition(
+                  (p) => res({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy }),
+                  () => res(null),
+                  { enableHighAccuracy: true, timeout: 8000 },
+                );
+              });
+              const r = await shareEmergency(pos, contacts.map((c) => c.phone));
+              if (r === "shared" || r === "sms") toast.success("Emergency message ready to send");
+              else if (r === "copied") toast.success("Location copied — paste in your messages");
+              else toast.error("Could not share");
+            }}
+          >
+            <Send className="h-5 w-5" /> Send emergency message to all
+          </Button>
+        )}
       </main>
 
       {showForm && (
