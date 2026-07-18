@@ -40,11 +40,24 @@ function SosPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // Prefer cached contacts for instant display; refresh in the background.
+    try {
+      const cached = localStorage.getItem("abhaya.contacts.cache");
+      if (cached) {
+        const parsed = JSON.parse(cached) as Contact[];
+        if (Array.isArray(parsed)) setContacts(parsed);
+      }
+    } catch { /* noop */ }
     supabase
       .from("emergency_contacts")
       .select("id, name, phone, priority")
       .order("priority", { ascending: true })
-      .then(({ data }) => { if (!cancelled) setContacts(data ?? []); });
+      .then(({ data }) => {
+        if (cancelled) return;
+        const list = data ?? [];
+        setContacts(list);
+        try { localStorage.setItem("abhaya.contacts.cache", JSON.stringify(list)); } catch { /* noop */ }
+      });
     return () => { cancelled = true; };
   }, []);
 
