@@ -4,6 +4,7 @@ import { MapPin, Share2, Play, Square, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/app/AppHeader";
 import { Button } from "@/components/ui/button";
+import { formatAccuracy } from "@/lib/geo";
 
 export const Route = createFileRoute("/_authenticated/live-location")({
   head: () => ({ meta: [{ title: "Live Location — Abhaya" }] }),
