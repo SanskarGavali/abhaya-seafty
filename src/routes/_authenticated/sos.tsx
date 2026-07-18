@@ -231,10 +231,14 @@ function SosPage() {
 
   const alertAll = async () => {
     const phones = contacts.map((c) => c.phone);
+    if (phones.length === 0) {
+      toast.error("No emergency contacts saved. Add contacts to enable Alert All.");
+      return;
+    }
     const r = await shareEmergency(pos, phones);
     if (r === "shared" || r === "sms") toast.success("Emergency message ready to send");
     else if (r === "copied") toast.success("Location copied — paste in your messages");
-    else toast.error("Could not share automatically");
+    else toast.error("Could not share automatically — try Share location");
   };
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
