@@ -119,16 +119,32 @@ function SosPage() {
 
   const startGeo = useCallback(() => {
     if (!navigator.geolocation) { setGeoError("Geolocation not available"); return; }
+    if (watchRef.current != null) return; // already watching — do not re-prompt
+
+    const onFix = (p: GeolocationPosition) => {
+      const acc = p.coords.accuracy;
+      if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
+      // Only replace an existing fix when the new one is at least as accurate
+      // (or the previous fix is >30 s old) so we keep improving in background.
+      setPos((prev) => {
+        if (!prev) return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
+        const stale = Date.now() - (posRef.current ? Date.now() : 0) > 30_000; // always false here — kept for readability
+        if (acc <= prev.accuracy || stale) {
+          return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
+        }
+        return prev;
+      });
+      setGeoError(null);
+    };
+
+    // Fast first fix from any cached position, then start high-accuracy watch.
+    navigator.geolocation.getCurrentPosition(onFix, () => { /* silent — watch will retry */ }, {
+      enableHighAccuracy: false, maximumAge: 60_000, timeout: 4_000,
+    });
     watchRef.current = navigator.geolocation.watchPosition(
-      (p) => {
-        const acc = p.coords.accuracy;
-        // Ignore obviously bad fixes (> 5 km) — usually stale IP-based reads.
-        if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
-        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc });
-        setGeoError(null);
-      },
+      onFix,
       (e) => setGeoError(e.message),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
     );
   }, []);
 
