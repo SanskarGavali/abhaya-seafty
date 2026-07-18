@@ -103,7 +103,7 @@ function LiveLocationPage() {
             {pos ? (
               <>
                 <div className="font-mono text-sm">{pos.lat.toFixed(6)}, {pos.lng.toFixed(6)}</div>
-                <div className="text-xs text-muted-foreground">Accuracy ±{Math.round(pos.accuracy)} m · updated {new Date(pos.ts).toLocaleTimeString()}</div>
+                <div className="text-xs text-muted-foreground">Accuracy {formatAccuracy(pos.accuracy)} · updated {new Date(pos.ts).toLocaleTimeString()}</div>
               </>
             ) : (
               <div className="text-sm text-muted-foreground">{error ?? "Not sharing yet"}</div>
