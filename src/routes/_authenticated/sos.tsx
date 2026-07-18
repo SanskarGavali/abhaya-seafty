@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { enableTorch, disableTorch } from "@/lib/torch";
 import { shareEmergency } from "@/lib/share";
+import { formatAccuracy } from "@/lib/geo";
 
 export const Route = createFileRoute("/_authenticated/sos")({
   head: () => ({ meta: [{ title: "Emergency SOS — Abhaya" }, { name: "robots", content: "noindex" }] }),
