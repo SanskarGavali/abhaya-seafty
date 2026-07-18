@@ -20,6 +20,7 @@ function AuthedLayout() {
       <Outlet />
       <BottomNav />
       <PWAInstallPrompt />
+      <PWAUpdateNotifier />
     </div>
   );
 }
