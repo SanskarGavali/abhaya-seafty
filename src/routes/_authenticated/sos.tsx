@@ -153,6 +153,17 @@ function SosPage() {
     watchRef.current = null;
   }, []);
 
+  // Pre-arm geolocation on mount when the user has already granted permission,
+  // so a fresh fix is ready the instant they tap SOS. If permission is unknown,
+  // we wait for the SOS tap so we never prompt unexpectedly.
+  useEffect(() => {
+    const nav = navigator as Navigator & { permissions?: { query: (p: { name: PermissionName }) => Promise<PermissionStatus> } };
+    if (!nav.permissions?.query) return;
+    nav.permissions.query({ name: "geolocation" as PermissionName })
+      .then((s) => { if (s.state === "granted") startGeo(); })
+      .catch(() => { /* noop */ });
+  }, [startGeo]);
+
   const logIncident = async (lat: number | null, lng: number | null) => {
     const { data: userData } = await supabase.auth.getUser();
     const uid = userData.user?.id;
@@ -192,12 +203,12 @@ function SosPage() {
     if (tickRef.current) clearInterval(tickRef.current);
     tickRef.current = null;
     stopSiren();
-    stopGeo();
+    // Keep GPS watch alive so re-activation is instant; it stops on unmount.
     releaseWakeLock();
     disableTorch();
     setTorchOn(false);
     toast.success("SOS deactivated");
-  }, [releaseWakeLock, stopGeo, stopSiren]);
+  }, [releaseWakeLock, stopSiren]);
 
   useEffect(() => () => {
     stopSiren(); stopGeo(); releaseWakeLock(); disableTorch();
