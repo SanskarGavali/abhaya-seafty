@@ -77,9 +77,8 @@ function ProfilePage() {
             { to: "/contacts" as const, icon: Phone, label: "Emergency Contacts", desc: "Manage priority contacts" },
             { to: "/settings" as const, icon: SettingsIcon, label: t("settings", lang), desc: "Language, alerts, privacy" },
             { to: "/notifications" as const, icon: Bell, label: t("notifications", lang), desc: "Alert history" },
-            { to: "/about" as const, icon: Info, label: "About Abhaya", desc: "Version & credits" },
           ].map(({ to, icon: Icon, label, desc }) => (
-            <Link key={to} to={to} className="flex items-center gap-4 border-b border-border/60 px-4 py-4 last:border-0 hover:bg-brand-soft/40">
+            <Link key={to} to={to} className="flex items-center gap-4 border-b border-border/60 px-4 py-4 hover:bg-brand-soft/40">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
                 <Icon className="h-5 w-5" />
               </div>
@@ -90,6 +89,33 @@ function ProfilePage() {
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
           ))}
+
+          <button
+            onClick={handleInstall}
+            className="flex w-full items-center gap-4 border-b border-border/60 px-4 py-4 text-left hover:bg-brand-soft/40"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow">
+              <Download className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">Download Abhaya App</div>
+              <div className="text-xs text-muted-foreground">
+                {installed ? "Already installed on this device" : installable ? "Install to your home screen" : "Add to Home Screen from your browser menu"}
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+
+          <Link to="/about" className="flex items-center gap-4 px-4 py-4 hover:bg-brand-soft/40">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
+              <Info className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="font-medium">About Abhaya</div>
+              <div className="text-xs text-muted-foreground">Version & credits</div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
         </nav>
 
         <div className="rounded-3xl bg-surface p-4 shadow-card">
