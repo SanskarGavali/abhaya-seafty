@@ -20,13 +20,31 @@ function ProfilePage() {
   const queryClient = useQueryClient();
   const [lang] = useLanguage();
   const [user, setUser] = useState<{ email?: string; name?: string } | null>(null);
+  const [installable, setInstallable] = useState(false);
+  const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       const meta = data.user?.user_metadata as { full_name?: string } | undefined;
       setUser({ email: data.user?.email ?? "", name: meta?.full_name });
     });
+    setInstalled(isStandalone());
+    setInstallable(isInstallAvailable());
+    const off = onInstallAvailabilityChange(setInstallable);
+    return () => { off(); };
   }, []);
+
+  const handleInstall = async () => {
+    if (installed) { toast.success("Abhaya is already installed"); return; }
+    const r = await promptInstall();
+    if (r === "accepted") toast.success("Installing Abhaya…");
+    else if (r === "unavailable") {
+      toast.info(
+        "Install isn't available yet on this browser. On iPhone: tap Share → Add to Home Screen. On Android Chrome: open the browser menu → Install app.",
+        { duration: 6000 },
+      );
+    }
+  };
 
   const handleSignOut = async () => {
     await queryClient.cancelQueries();
