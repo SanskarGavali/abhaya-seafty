@@ -28,7 +28,12 @@ function LiveLocationPage() {
     setElapsed(0);
     tickRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
     watchRef.current = navigator.geolocation.watchPosition(
-      (p) => setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy, ts: p.timestamp }),
+      (p) => {
+        const acc = p.coords.accuracy;
+        if (!isFinite(acc) || acc > 5000) { setError("Waiting for a better GPS signal…"); return; }
+        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc, ts: p.timestamp });
+        setError(null);
+      },
       (e) => setError(e.message),
       { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 },
     );
