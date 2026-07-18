@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { Download, ShieldCheck, X } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import type { Language } from "@/lib/i18n";
-
-type BIPEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
+import { isInstallAvailable, isStandalone, onInstallAvailabilityChange, promptInstall } from "@/lib/pwa-install";
 
 const SESSION_DISMISSED = "abhaya.installDismissed.session";
 
@@ -28,30 +24,31 @@ function tr<K extends keyof typeof copy>(k: K, lang: Language) {
 
 export function PWAInstallPrompt() {
   const [lang] = useLanguage();
-  const [evt, setEvt] = useState<BIPEvent | null>(null);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem(SESSION_DISMISSED)) return;
+    if (isStandalone()) return;
 
-    const nav = window.navigator as Navigator & { standalone?: boolean };
-    const standalone = window.matchMedia?.("(display-mode: standalone)").matches || nav.standalone;
-    if (standalone) return;
-
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setEvt(e as BIPEvent);
-      // Spec: show the popup ~2s after the home dashboard is reached.
-      window.setTimeout(() => {
-        if (!sessionStorage.getItem(SESSION_DISMISSED)) setShow(true);
+    let timer: number | null = null;
+    const schedule = () => {
+      if (timer != null) return;
+      timer = window.setTimeout(() => {
+        timer = null;
+        if (!sessionStorage.getItem(SESSION_DISMISSED) && isInstallAvailable() && !isStandalone()) {
+          setShow(true);
+        }
       }, 2000);
     };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    const onInstalled = () => { setShow(false); setEvt(null); };
-    window.addEventListener("appinstalled", onInstalled);
+
+    if (isInstallAvailable()) schedule();
+    const off = onInstallAvailabilityChange((available) => {
+      if (available) schedule();
+      else setShow(false);
+    });
     return () => {
-      window.removeEventListener("beforeinstallprompt", onPrompt);
-      window.removeEventListener("appinstalled", onInstalled);
+      off();
+      if (timer != null) clearTimeout(timer);
     };
   }, []);
 
@@ -61,18 +58,12 @@ export function PWAInstallPrompt() {
   };
 
   const install = async () => {
-    if (!evt) { dismiss(); return; }
-    try {
-      await evt.prompt();
-      await evt.userChoice;
-    } finally {
-      sessionStorage.setItem(SESSION_DISMISSED, "1");
-      setShow(false);
-      setEvt(null);
-    }
+    await promptInstall();
+    sessionStorage.setItem(SESSION_DISMISSED, "1");
+    setShow(false);
   };
 
-  if (!show || !evt) return null;
+  if (!show) return null;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-5">
