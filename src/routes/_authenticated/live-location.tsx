@@ -4,6 +4,7 @@ import { MapPin, Share2, Play, Square, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/app/AppHeader";
 import { Button } from "@/components/ui/button";
+import { formatAccuracy } from "@/lib/geo";
 
 export const Route = createFileRoute("/_authenticated/live-location")({
   head: () => ({ meta: [{ title: "Live Location — Abhaya" }] }),
@@ -27,7 +28,12 @@ function LiveLocationPage() {
     setElapsed(0);
     tickRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
     watchRef.current = navigator.geolocation.watchPosition(
-      (p) => setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy, ts: p.timestamp }),
+      (p) => {
+        const acc = p.coords.accuracy;
+        if (!isFinite(acc) || acc > 5000) { setError("Waiting for a better GPS signal…"); return; }
+        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc, ts: p.timestamp });
+        setError(null);
+      },
       (e) => setError(e.message),
       { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 },
     );
@@ -97,7 +103,7 @@ function LiveLocationPage() {
             {pos ? (
               <>
                 <div className="font-mono text-sm">{pos.lat.toFixed(6)}, {pos.lng.toFixed(6)}</div>
-                <div className="text-xs text-muted-foreground">Accuracy ±{Math.round(pos.accuracy)} m · updated {new Date(pos.ts).toLocaleTimeString()}</div>
+                <div className="text-xs text-muted-foreground">Accuracy {formatAccuracy(pos.accuracy)} · updated {new Date(pos.ts).toLocaleTimeString()}</div>
               </>
             ) : (
               <div className="text-sm text-muted-foreground">{error ?? "Not sharing yet"}</div>
