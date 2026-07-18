@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Settings as SettingsIcon, LogOut, Phone, ShieldCheck, ChevronRight, Bell, Info } from "lucide-react";
+import { Settings as SettingsIcon, LogOut, Phone, ShieldCheck, ChevronRight, Bell, Info, Download } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/app/AppHeader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/use-language";
 import { t } from "@/lib/i18n";
+import { isInstallAvailable, isStandalone, onInstallAvailabilityChange, promptInstall } from "@/lib/pwa-install";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "Profile — Abhaya" }] }),
