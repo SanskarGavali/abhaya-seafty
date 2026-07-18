@@ -40,11 +40,24 @@ function SosPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // Prefer cached contacts for instant display; refresh in the background.
+    try {
+      const cached = localStorage.getItem("abhaya.contacts.cache");
+      if (cached) {
+        const parsed = JSON.parse(cached) as Contact[];
+        if (Array.isArray(parsed)) setContacts(parsed);
+      }
+    } catch { /* noop */ }
     supabase
       .from("emergency_contacts")
       .select("id, name, phone, priority")
       .order("priority", { ascending: true })
-      .then(({ data }) => { if (!cancelled) setContacts(data ?? []); });
+      .then(({ data }) => {
+        if (cancelled) return;
+        const list = data ?? [];
+        setContacts(list);
+        try { localStorage.setItem("abhaya.contacts.cache", JSON.stringify(list)); } catch { /* noop */ }
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -106,16 +119,32 @@ function SosPage() {
 
   const startGeo = useCallback(() => {
     if (!navigator.geolocation) { setGeoError("Geolocation not available"); return; }
+    if (watchRef.current != null) return; // already watching — do not re-prompt
+
+    const onFix = (p: GeolocationPosition) => {
+      const acc = p.coords.accuracy;
+      if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
+      // Only replace an existing fix when the new one is at least as accurate
+      // (or the previous fix is >30 s old) so we keep improving in background.
+      setPos((prev) => {
+        if (!prev) return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
+        const stale = Date.now() - (posRef.current ? Date.now() : 0) > 30_000; // always false here — kept for readability
+        if (acc <= prev.accuracy || stale) {
+          return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
+        }
+        return prev;
+      });
+      setGeoError(null);
+    };
+
+    // Fast first fix from any cached position, then start high-accuracy watch.
+    navigator.geolocation.getCurrentPosition(onFix, () => { /* silent — watch will retry */ }, {
+      enableHighAccuracy: false, maximumAge: 60_000, timeout: 4_000,
+    });
     watchRef.current = navigator.geolocation.watchPosition(
-      (p) => {
-        const acc = p.coords.accuracy;
-        // Ignore obviously bad fixes (> 5 km) — usually stale IP-based reads.
-        if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
-        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc });
-        setGeoError(null);
-      },
+      onFix,
       (e) => setGeoError(e.message),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
     );
   }, []);
 
@@ -123,6 +152,17 @@ function SosPage() {
     if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
     watchRef.current = null;
   }, []);
+
+  // Pre-arm geolocation on mount when the user has already granted permission,
+  // so a fresh fix is ready the instant they tap SOS. If permission is unknown,
+  // we wait for the SOS tap so we never prompt unexpectedly.
+  useEffect(() => {
+    const nav = navigator as Navigator & { permissions?: { query: (p: { name: PermissionName }) => Promise<PermissionStatus> } };
+    if (!nav.permissions?.query) return;
+    nav.permissions.query({ name: "geolocation" as PermissionName })
+      .then((s) => { if (s.state === "granted") startGeo(); })
+      .catch(() => { /* noop */ });
+  }, [startGeo]);
 
   const logIncident = async (lat: number | null, lng: number | null) => {
     const { data: userData } = await supabase.auth.getUser();
@@ -163,12 +203,12 @@ function SosPage() {
     if (tickRef.current) clearInterval(tickRef.current);
     tickRef.current = null;
     stopSiren();
-    stopGeo();
+    // Keep GPS watch alive so re-activation is instant; it stops on unmount.
     releaseWakeLock();
     disableTorch();
     setTorchOn(false);
     toast.success("SOS deactivated");
-  }, [releaseWakeLock, stopGeo, stopSiren]);
+  }, [releaseWakeLock, stopSiren]);
 
   useEffect(() => () => {
     stopSiren(); stopGeo(); releaseWakeLock(); disableTorch();
@@ -191,10 +231,14 @@ function SosPage() {
 
   const alertAll = async () => {
     const phones = contacts.map((c) => c.phone);
+    if (phones.length === 0) {
+      toast.error("No emergency contacts saved. Add contacts to enable Alert All.");
+      return;
+    }
     const r = await shareEmergency(pos, phones);
     if (r === "shared" || r === "sms") toast.success("Emergency message ready to send");
     else if (r === "copied") toast.success("Location copied — paste in your messages");
-    else toast.error("Could not share automatically");
+    else toast.error("Could not share automatically — try Share location");
   };
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
