@@ -107,9 +107,15 @@ function SosPage() {
   const startGeo = useCallback(() => {
     if (!navigator.geolocation) { setGeoError("Geolocation not available"); return; }
     watchRef.current = navigator.geolocation.watchPosition(
-      (p) => { setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy }); setGeoError(null); },
+      (p) => {
+        const acc = p.coords.accuracy;
+        // Ignore obviously bad fixes (> 5 km) — usually stale IP-based reads.
+        if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
+        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc });
+        setGeoError(null);
+      },
       (e) => setGeoError(e.message),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
     );
   }, []);
 
