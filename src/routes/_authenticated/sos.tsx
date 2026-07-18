@@ -260,7 +260,7 @@ function SosPage() {
               {pos ? (
                 <>
                   <div className="mt-1 font-mono text-lg">{pos.lat.toFixed(5)}, {pos.lng.toFixed(5)}</div>
-                  <div className="text-xs opacity-80">Accuracy ±{Math.round(pos.accuracy)} m · updating live</div>
+                  <div className="text-xs opacity-80">Accuracy {formatAccuracy(pos.accuracy)} · updating live</div>
                 </>
               ) : (
                 <div className="mt-1 text-sm opacity-90">{geoError ? geoError : "Acquiring GPS fix…"}</div>
