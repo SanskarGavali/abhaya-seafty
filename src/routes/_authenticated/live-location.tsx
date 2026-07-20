@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { AppHeader } from "@/components/app/AppHeader";
 import { Button } from "@/components/ui/button";
 import { formatAccuracy } from "@/lib/geo";
+import { mapPositionError, friendlyGeoError } from "@/lib/location";
 
 export const Route = createFileRoute("/_authenticated/live-location")({
   head: () => ({ meta: [{ title: "Live Location — Abhaya" }] }),
@@ -22,7 +23,7 @@ function LiveLocationPage() {
   const tickRef = useRef<number | null>(null);
 
   const start = () => {
-    if (!navigator.geolocation) { setError("Geolocation not available on this device"); return; }
+    if (!navigator.geolocation) { setError(friendlyGeoError("unsupported").message); return; }
     setError(null);
     setSharing(true);
     setElapsed(0);
@@ -30,11 +31,11 @@ function LiveLocationPage() {
     watchRef.current = navigator.geolocation.watchPosition(
       (p) => {
         const acc = p.coords.accuracy;
-        if (!isFinite(acc) || acc > 5000) { setError("Waiting for a better GPS signal…"); return; }
+        if (!isFinite(acc) || acc > 5000) { setError(friendlyGeoError("poor_accuracy").message); return; }
         setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc, ts: p.timestamp });
         setError(null);
       },
-      (e) => setError(e.message),
+      (e) => setError(mapPositionError(e).message),
       { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 },
     );
   };

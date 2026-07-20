@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { enableTorch, disableTorch } from "@/lib/torch";
 import { shareEmergency } from "@/lib/share";
 import { formatAccuracy } from "@/lib/geo";
+import { mapPositionError, friendlyGeoError } from "@/lib/location";
 
 export const Route = createFileRoute("/_authenticated/sos")({
   head: () => ({ meta: [{ title: "Emergency SOS — Abhaya" }, { name: "robots", content: "noindex" }] }),
@@ -118,18 +119,15 @@ function SosPage() {
   }, []);
 
   const startGeo = useCallback(() => {
-    if (!navigator.geolocation) { setGeoError("Geolocation not available"); return; }
+    if (!navigator.geolocation) { setGeoError(friendlyGeoError("unsupported").message); return; }
     if (watchRef.current != null) return; // already watching — do not re-prompt
 
     const onFix = (p: GeolocationPosition) => {
       const acc = p.coords.accuracy;
-      if (!isFinite(acc) || acc > 5000) { setGeoError("Waiting for a better GPS signal…"); return; }
-      // Only replace an existing fix when the new one is at least as accurate
-      // (or the previous fix is >30 s old) so we keep improving in background.
+      if (!isFinite(acc) || acc > 5000) { setGeoError(friendlyGeoError("poor_accuracy").message); return; }
       setPos((prev) => {
         if (!prev) return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
-        const stale = Date.now() - (posRef.current ? Date.now() : 0) > 30_000; // always false here — kept for readability
-        if (acc <= prev.accuracy || stale) {
+        if (acc <= prev.accuracy) {
           return { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc };
         }
         return prev;
@@ -143,7 +141,7 @@ function SosPage() {
     });
     watchRef.current = navigator.geolocation.watchPosition(
       onFix,
-      (e) => setGeoError(e.message),
+      (e) => setGeoError(mapPositionError(e).message),
       { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
     );
   }, []);
