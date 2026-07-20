@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
-import { MapPin, Navigation, Phone, RefreshCw, Search, Filter, Loader2, AlertTriangle } from "lucide-react";
+import { LocationPermissionGate } from "@/components/app/LocationPermissionGate";
+import {
+  MapPin, Navigation, Phone, RefreshCw, Search, Filter, Loader2, AlertTriangle, WifiOff,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatAccuracy } from "@/lib/geo";
 import { toast } from "sonner";
@@ -11,7 +14,10 @@ export const Route = createFileRoute("/_authenticated/map")({
   component: MapPage,
 });
 
-type Category = "police" | "women_police" | "hospital" | "one_stop" | "shelter" | "ngo";
+type Category =
+  | "police" | "women_police" | "hospital" | "gov_hospital" | "fire" | "bus" | "railway"
+  | "petrol" | "pharmacy" | "hotel" | "mall" | "temple" | "college" | "university"
+  | "library" | "bank" | "atm" | "gov_office" | "municipal";
 
 type Place = {
   id: string;
@@ -25,12 +31,25 @@ type Place = {
 };
 
 const CATEGORY_META: Record<Category, { label: string; short: string; priority: number; color: string }> = {
-  police: { label: "Police Station", short: "Police", priority: 1, color: "bg-blue-500/10 text-blue-600" },
-  women_police: { label: "Women Police Station", short: "Women Police", priority: 2, color: "bg-pink-500/10 text-pink-600" },
-  hospital: { label: "Hospital", short: "Hospital", priority: 3, color: "bg-red-500/10 text-red-600" },
-  one_stop: { label: "One Stop Centre (Sakhi)", short: "One Stop", priority: 4, color: "bg-purple-500/10 text-purple-600" },
-  shelter: { label: "Shelter Home", short: "Shelter", priority: 5, color: "bg-amber-500/10 text-amber-600" },
-  ngo: { label: "Women NGO", short: "NGO", priority: 6, color: "bg-emerald-500/10 text-emerald-600" },
+  police:        { label: "Police Station",         short: "Police",       priority: 1, color: "bg-blue-500/10 text-blue-600" },
+  women_police:  { label: "Women Police Station",   short: "Women Police", priority: 1, color: "bg-pink-500/10 text-pink-600" },
+  hospital:      { label: "Hospital",               short: "Hospital",     priority: 2, color: "bg-red-500/10 text-red-600" },
+  gov_hospital:  { label: "Government Hospital",    short: "Govt Hospital",priority: 2, color: "bg-red-600/10 text-red-700" },
+  fire:          { label: "Fire Station",           short: "Fire",         priority: 2, color: "bg-orange-500/10 text-orange-600" },
+  pharmacy:      { label: "Pharmacy",               short: "Pharmacy",     priority: 3, color: "bg-emerald-500/10 text-emerald-600" },
+  bus:           { label: "Bus Stand",              short: "Bus",          priority: 4, color: "bg-cyan-500/10 text-cyan-600" },
+  railway:       { label: "Railway Station",        short: "Railway",      priority: 4, color: "bg-cyan-600/10 text-cyan-700" },
+  petrol:        { label: "Petrol Pump",            short: "Petrol",       priority: 5, color: "bg-yellow-600/10 text-yellow-700" },
+  atm:           { label: "ATM",                    short: "ATM",          priority: 5, color: "bg-lime-600/10 text-lime-700" },
+  bank:          { label: "Bank",                   short: "Bank",         priority: 5, color: "bg-lime-500/10 text-lime-600" },
+  hotel:         { label: "Hotel / Lodge",          short: "Hotel",        priority: 6, color: "bg-indigo-500/10 text-indigo-600" },
+  mall:          { label: "Shopping Mall",          short: "Mall",         priority: 6, color: "bg-purple-500/10 text-purple-600" },
+  temple:        { label: "Temple",                 short: "Temple",       priority: 6, color: "bg-amber-500/10 text-amber-600" },
+  college:       { label: "College",                short: "College",      priority: 6, color: "bg-sky-500/10 text-sky-600" },
+  university:    { label: "University",             short: "University",   priority: 6, color: "bg-sky-600/10 text-sky-700" },
+  library:       { label: "Public Library",         short: "Library",      priority: 6, color: "bg-teal-500/10 text-teal-600" },
+  gov_office:    { label: "Government Office",      short: "Govt Office",  priority: 6, color: "bg-slate-500/10 text-slate-600" },
+  municipal:     { label: "Municipal Office",       short: "Municipal",    priority: 6, color: "bg-slate-600/10 text-slate-700" },
 };
 
 const LAST_LOC_KEY = "abhaya:lastKnownLocation";
@@ -49,173 +68,248 @@ function classify(tags: Record<string, string>): Category | null {
   const amenity = tags.amenity;
   const name = (tags.name || "").toLowerCase();
   const operator = (tags.operator || "").toLowerCase();
-  const social = tags["social_facility"] || tags["social_facility:for"] || "";
+  const opType = (tags["operator:type"] || "").toLowerCase();
+  const office = tags.office;
+  const shop = tags.shop;
+  const tourism = tags.tourism;
+  const railway = tags.railway;
+  const govType = (tags.government || "").toLowerCase();
+
   if (amenity === "police") {
     if (name.includes("women") || name.includes("mahila") || operator.includes("women")) return "women_police";
     return "police";
   }
-  if (amenity === "hospital" || amenity === "clinic") return "hospital";
-  if (amenity === "shelter" || /shelter/.test(social)) return "shelter";
-  if (name.includes("one stop") || name.includes("sakhi") || name.includes("osc")) return "one_stop";
-  if (tags.office === "ngo" || tags["office:ngo"] || name.includes("ngo") || name.includes("women")) return "ngo";
+  if (amenity === "hospital") {
+    if (opType.includes("government") || operator.includes("government") || name.includes("civil") || name.includes("district")) return "gov_hospital";
+    return "hospital";
+  }
+  if (amenity === "clinic") return "hospital";
+  if (amenity === "fire_station") return "fire";
+  if (amenity === "pharmacy") return "pharmacy";
+  if (amenity === "bus_station") return "bus";
+  if (railway === "station") return "railway";
+  if (amenity === "fuel") return "petrol";
+  if (amenity === "atm") return "atm";
+  if (amenity === "bank") return "bank";
+  if (tourism === "hotel" || tourism === "guest_house" || tourism === "hostel") return "hotel";
+  if (shop === "mall") return "mall";
+  if (amenity === "place_of_worship" && (tags.religion === "hindu" || name.includes("temple") || name.includes("mandir"))) return "temple";
+  if (amenity === "college") return "college";
+  if (amenity === "university") return "university";
+  if (amenity === "library") return "library";
+  if (amenity === "townhall") return "municipal";
+  if (office === "government") {
+    if (govType.includes("municipal") || name.includes("municipal") || name.includes("nagar")) return "municipal";
+    return "gov_office";
+  }
   return null;
 }
 
-async function fetchNearby(lat: number, lng: number, radiusM = 5000): Promise<Place[]> {
+// Custom error kinds so the UI can render friendly messages, never raw
+// browser strings like "The user aborted a request".
+class PlacesError extends Error {
+  kind: "network" | "timeout" | "server" | "unknown";
+  constructor(kind: "network" | "timeout" | "server" | "unknown", msg: string) {
+    super(msg);
+    this.kind = kind;
+  }
+}
+
+async function fetchNearby(
+  lat: number, lng: number, radiusM: number, signal: AbortSignal,
+): Promise<Place[]> {
   const query = `
     [out:json][timeout:20];
     (
-      node["amenity"~"police|hospital|clinic|shelter"](around:${radiusM},${lat},${lng});
-      way["amenity"~"police|hospital|clinic|shelter"](around:${radiusM},${lat},${lng});
-      node["office"="ngo"](around:${radiusM},${lat},${lng});
-      node["social_facility"](around:${radiusM},${lat},${lng});
+      node["amenity"~"police|hospital|clinic|fire_station|pharmacy|bus_station|fuel|atm|bank|college|university|library|townhall|place_of_worship"](around:${radiusM},${lat},${lng});
+      way["amenity"~"police|hospital|fire_station|bus_station|college|university|library|townhall"](around:${radiusM},${lat},${lng});
+      node["railway"="station"](around:${radiusM},${lat},${lng});
+      node["tourism"~"hotel|guest_house|hostel"](around:${radiusM},${lat},${lng});
+      way["tourism"~"hotel|guest_house|hostel"](around:${radiusM},${lat},${lng});
+      node["shop"="mall"](around:${radiusM},${lat},${lng});
+      way["shop"="mall"](around:${radiusM},${lat},${lng});
+      node["office"="government"](around:${radiusM},${lat},${lng});
+      way["office"="government"](around:${radiusM},${lat},${lng});
     );
-    out center tags 80;
+    out center tags 200;
   `.trim();
 
   const endpoints = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.openstreetmap.ru/api/interpreter",
   ];
 
-  let lastErr: unknown = null;
+  let lastKind: "network" | "timeout" | "server" | "unknown" = "unknown";
   for (const url of endpoints) {
+    if (signal.aborted) throw new PlacesError("unknown", "cancelled");
     try {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), 15000);
-      const res = await fetch(url, {
-        method: "POST",
-        body: `data=${encodeURIComponent(query)}`,
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        signal: controller.signal,
-      });
-      clearTimeout(t);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as { elements: Array<{ id: number; type: string; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }> };
-      const out: Place[] = [];
-      for (const el of data.elements ?? []) {
-        const tags = el.tags ?? {};
-        const cat = classify(tags);
-        if (!cat) continue;
-        const plat = el.lat ?? el.center?.lat;
-        const plng = el.lon ?? el.center?.lon;
-        if (plat == null || plng == null) continue;
-        const name = tags.name || tags["name:en"] || CATEGORY_META[cat].label;
-        const addressParts = [tags["addr:housenumber"], tags["addr:street"], tags["addr:suburb"], tags["addr:city"]].filter(Boolean);
-        out.push({
-          id: `${el.type}/${el.id}`,
-          name,
-          category: cat,
-          lat: plat,
-          lng: plng,
-          address: addressParts.length ? addressParts.join(", ") : undefined,
-          phone: tags.phone || tags["contact:phone"] || undefined,
-          distanceKm: haversineKm(lat, lng, plat, plng),
+      // Per-endpoint timeout via a linked AbortController so failing
+      // endpoint doesn't cascade into a real user-visible abort.
+      const local = new AbortController();
+      const onOuter = () => local.abort();
+      signal.addEventListener("abort", onOuter);
+      const timer = setTimeout(() => local.abort(), 18000);
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          body: `data=${encodeURIComponent(query)}`,
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          signal: local.signal,
         });
+        if (!res.ok) { lastKind = res.status >= 500 ? "server" : "network"; continue; }
+        const data = (await res.json()) as { elements: Array<{ id: number; type: string; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }> };
+        const seen = new Set<string>();
+        const out: Place[] = [];
+        for (const el of data.elements ?? []) {
+          const tags = el.tags ?? {};
+          const cat = classify(tags);
+          if (!cat) continue;
+          const plat = el.lat ?? el.center?.lat;
+          const plng = el.lon ?? el.center?.lon;
+          if (plat == null || plng == null) continue;
+          const id = `${el.type}/${el.id}`;
+          if (seen.has(id)) continue;
+          seen.add(id);
+          const name = tags.name || tags["name:en"] || CATEGORY_META[cat].label;
+          const addressParts = [tags["addr:housenumber"], tags["addr:street"], tags["addr:suburb"], tags["addr:city"]].filter(Boolean);
+          out.push({
+            id, name, category: cat,
+            lat: plat, lng: plng,
+            address: addressParts.length ? addressParts.join(", ") : undefined,
+            phone: tags.phone || tags["contact:phone"] || undefined,
+            distanceKm: haversineKm(lat, lng, plat, plng),
+          });
+        }
+        return out;
+      } finally {
+        clearTimeout(timer);
+        signal.removeEventListener("abort", onOuter);
       }
-      return out;
     } catch (e) {
-      lastErr = e;
+      if (signal.aborted) throw new PlacesError("unknown", "cancelled");
+      const name = (e as Error)?.name;
+      if (name === "AbortError") { lastKind = "timeout"; continue; }
+      lastKind = "network";
     }
   }
-  throw lastErr ?? new Error("Failed to fetch nearby places");
+  throw new PlacesError(lastKind, "all endpoints failed");
 }
 
 function walkMinutes(km: number): number {
-  // Approx: 5 km/h walking, but for driving we don't know traffic — show walking as a friendly baseline.
   return Math.max(1, Math.round((km / 5) * 60));
 }
 
 function MapPage() {
-  const [pos, setPos] = useState<{ lat: number; lng: number; accuracy?: number; stale?: boolean } | null>(null);
+  return (
+    <div className="pb-24">
+      <AppHeader title="Safe Places Nearby" />
+      <LocationPermissionGate purpose="We use your location to show police stations, hospitals, and other safe places nearby. You can change this any time.">
+        {(initialPos) => <PlacesList initialPos={initialPos} />}
+      </LocationPermissionGate>
+    </div>
+  );
+}
+
+function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; accuracy: number } }) {
+  const [pos, setPos] = useState<{ lat: number; lng: number; accuracy?: number; stale?: boolean }>({ ...initialPos });
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
+  const [radiusKm, setRadiusKm] = useState(5);
   const [sosActive, setSosActive] = useState(false);
+  const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const abortRef = useRef<AbortController | null>(null);
+  const watchRef = useRef<number | null>(null);
+  const lastRefreshLoc = useRef<{ lat: number; lng: number } | null>(null);
 
-  // Detect SOS active state (best-effort — the SOS page sets this flag).
   useEffect(() => {
-    try {
-      setSosActive(sessionStorage.getItem("abhaya:sosActive") === "1");
-    } catch { /* ignore */ }
+    try { setSosActive(sessionStorage.getItem("abhaya:sosActive") === "1"); } catch { /* ignore */ }
   }, []);
 
-  // Load last known location immediately (never crash if unavailable).
+  // Persist last known location so a returning user without a fresh GPS
+  // fix still sees relevant results (also seeds the gate on next open).
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(LAST_LOC_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as { lat: number; lng: number; accuracy?: number; ts: number };
-        if (Number.isFinite(parsed.lat) && Number.isFinite(parsed.lng)) {
-          setPos({ lat: parsed.lat, lng: parsed.lng, accuracy: parsed.accuracy, stale: true });
-        }
-      }
+      localStorage.setItem(LAST_LOC_KEY, JSON.stringify({ ...pos, ts: Date.now() }));
     } catch { /* ignore */ }
-  }, []);
+  }, [pos]);
 
-  const acquireLocation = useCallback((opts: { silent?: boolean } = {}) => {
-    if (!("geolocation" in navigator)) {
-      if (!opts.silent) setError("Location services are not available on this device.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
+  // Continuous location updates so the list refreshes as the user moves.
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+    watchRef.current = navigator.geolocation.watchPosition(
       (p) => {
         const acc = p.coords.accuracy;
-        const next = { lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc, stale: false };
-        setPos(next);
-        try {
-          localStorage.setItem(LAST_LOC_KEY, JSON.stringify({ ...next, ts: Date.now() }));
-        } catch { /* ignore */ }
+        if (!isFinite(acc) || acc > 5000) return;
+        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: acc, stale: false });
       },
-      (e) => {
-        if (!opts.silent) {
-          setError(
-            e.code === e.PERMISSION_DENIED
-              ? "Location permission is off. Enable it in your browser to find safe places near you."
-              : "Couldn't get your current location. Showing your last known area if available.",
-          );
-        }
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 },
+      () => { /* silent — we already have initialPos */ },
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
     );
+    return () => {
+      if (watchRef.current != null) navigator.geolocation.clearWatch(watchRef.current);
+    };
   }, []);
 
-  useEffect(() => { acquireLocation(); }, [acquireLocation]);
-
-  const loadPlaces = useCallback(async (lat: number, lng: number) => {
+  const loadPlaces = useCallback(async (lat: number, lng: number, radius: number) => {
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setLoading(true);
-    setError(null);
+    setErrorMsg(null);
     try {
-      const results = await fetchNearby(lat, lng);
+      const results = await fetchNearby(lat, lng, radius * 1000, ctrl.signal);
       if (ctrl.signal.aborted) return;
       setPlaces(results);
+      lastRefreshLoc.current = { lat, lng };
       if (results.length === 0) {
-        setError("No safe places found within 5 km. Try widening your search area or check your connection.");
+        setErrorMsg(`No safe places found within ${radius} km. Try a wider search.`);
       }
     } catch (e) {
-      if (ctrl.signal.aborted) return;
-      const msg = e instanceof Error ? e.message : "Unknown error";
-      setError(`Couldn't load nearby places (${msg}). You can still call emergency numbers directly.`);
-      setPlaces([]);
+      if (ctrl.signal.aborted) return; // silent, superseded
+      const kind = (e as PlacesError).kind;
+      if (kind === "timeout") {
+        setErrorMsg("Loading is taking longer than expected. Please check your connection and try again.");
+      } else if (kind === "network" || !navigator.onLine) {
+        setErrorMsg("Unable to load nearby safe places. Please check your internet connection and try again. You can still use Emergency SOS and Emergency Calling.");
+      } else {
+        setErrorMsg("We couldn't load nearby places right now. Please try again in a moment.");
+      }
+      // Keep any existing results so the UI never blanks out.
     } finally {
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }, []);
 
+  // Initial fetch + refetch when user moves > 300 m.
   useEffect(() => {
-    if (pos && !pos.stale) loadPlaces(pos.lat, pos.lng);
-  }, [pos, loadPlaces]);
+    const last = lastRefreshLoc.current;
+    const moved = !last || haversineKm(last.lat, last.lng, pos.lat, pos.lng) > 0.3;
+    if (moved) loadPlaces(pos.lat, pos.lng, radiusKm);
+  }, [pos.lat, pos.lng, radiusKm, loadPlaces]);
+
+  // Auto-retry when the browser comes back online.
+  useEffect(() => {
+    const onOnline = () => {
+      setOnline(true);
+      if (errorMsg) loadPlaces(pos.lat, pos.lng, radiusKm);
+    };
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [errorMsg, pos.lat, pos.lng, radiusKm, loadPlaces]);
 
   const refresh = () => {
-    setError(null);
-    acquireLocation();
-    if (pos) loadPlaces(pos.lat, pos.lng);
+    setErrorMsg(null);
+    loadPlaces(pos.lat, pos.lng, radiusKm);
   };
 
   const filtered = useMemo(() => {
@@ -237,166 +331,176 @@ function MapPage() {
     return list;
   }, [places, category, query, sosActive]);
 
-  const categories: (Category | "all")[] = ["all", "police", "women_police", "hospital", "one_stop", "shelter", "ngo"];
+  const categories: (Category | "all")[] = [
+    "all", "police", "women_police", "hospital", "gov_hospital", "fire", "pharmacy",
+    "bus", "railway", "petrol", "atm", "bank", "hotel", "mall", "temple",
+    "college", "university", "library", "gov_office", "municipal",
+  ];
 
   return (
-    <div className="pb-24">
-      <AppHeader title="Safe Places Nearby" />
-      <main className="mx-auto max-w-lg space-y-4 px-4 pt-4">
-        {sosActive && (
-          <div className="flex items-center gap-2 rounded-2xl bg-emergency/10 px-3 py-2 text-xs font-semibold text-emergency">
-            <AlertTriangle className="h-4 w-4" /> SOS active — prioritizing police & hospitals
-          </div>
-        )}
+    <main className="mx-auto max-w-lg space-y-4 px-4 pt-4">
+      {sosActive && (
+        <div className="flex items-center gap-2 rounded-2xl bg-emergency/10 px-3 py-2 text-xs font-semibold text-emergency">
+          <AlertTriangle className="h-4 w-4" /> SOS active — prioritizing police & hospitals
+        </div>
+      )}
 
-        {/* Location status */}
-        <div className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
-              <MapPin className="h-5 w-5" />
+      {!online && (
+        <div className="flex items-center gap-2 rounded-2xl bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-700">
+          <WifiOff className="h-4 w-4" /> You're offline. Reconnect to refresh nearby places.
+        </div>
+      )}
+
+      {/* Location status */}
+      <div className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
+            <MapPin className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <div className="text-sm font-semibold">Your current location</div>
+            <div className="text-xs text-muted-foreground">
+              {pos.lat.toFixed(4)}, {pos.lng.toFixed(4)} · {formatAccuracy(pos.accuracy)}
             </div>
-            <div className="flex-1">
-              <div className="text-sm font-semibold">
-                {pos ? (pos.stale ? "Last known location" : "Your current location") : "Locating…"}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {pos ? (
-                  <>
-                    {pos.lat.toFixed(4)}, {pos.lng.toFixed(4)} · {formatAccuracy(pos.accuracy)}
-                  </>
-                ) : (
-                  "Waiting for GPS…"
-                )}
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              Refresh
+          </div>
+          <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Search + radius */}
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name or area…"
+          className="w-full rounded-2xl border border-border bg-surface py-3 pl-9 pr-3 text-sm outline-none focus:border-brand"
+        />
+      </div>
+
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Radius:</span>
+        {[2, 5, 10, 20].map((r) => (
+          <button
+            key={r}
+            onClick={() => setRadiusKm(r)}
+            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${
+              radiusKm === r ? "border-brand bg-brand text-brand-foreground" : "border-border bg-surface"
+            }`}
+          >{r} km</button>
+        ))}
+      </div>
+
+      {/* Category filter */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        {categories.map((c) => {
+          const active = category === c;
+          const label = c === "all" ? "All" : CATEGORY_META[c].short;
+          return (
+            <button
+              key={c}
+              onClick={() => setCategory(c)}
+              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                active ? "border-brand bg-brand text-brand-foreground" : "border-border bg-surface text-foreground/70 hover:bg-brand-soft"
+              }`}
+            >
+              {c === "all" && <Filter className="mr-1 inline h-3 w-3" />}
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Error banner with retry */}
+      {errorMsg && !loading && (
+        <div className="space-y-2 rounded-2xl bg-emergency/10 p-3 text-sm text-emergency">
+          <div>{errorMsg}</div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="emergency" onClick={refresh}>
+              <RefreshCw className="h-4 w-4" /> Retry
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <a href="tel:112">Call 112</a>
             </Button>
           </div>
         </div>
+      )}
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name or area…"
-            className="w-full rounded-2xl border border-border bg-surface py-3 pl-9 pr-3 text-sm outline-none focus:border-brand"
-          />
+      {loading && (
+        <div className="flex items-center justify-center gap-2 rounded-2xl bg-surface p-6 text-sm text-muted-foreground shadow-card">
+          <Loader2 className="h-4 w-4 animate-spin" /> Finding safe places near you…
         </div>
+      )}
 
-        {/* Category filter */}
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-          {categories.map((c) => {
-            const active = category === c;
-            const label = c === "all" ? "All" : CATEGORY_META[c].short;
+      {!loading && filtered.length > 0 && (
+        <ul className="space-y-3">
+          {filtered.map((p) => {
+            const meta = CATEGORY_META[p.category];
+            const km = p.distanceKm < 1 ? `${Math.round(p.distanceKm * 1000)} m` : `${p.distanceKm.toFixed(1)} km`;
+            const mins = walkMinutes(p.distanceKm);
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
+            const gmapsView = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
             return (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active
-                    ? "border-brand bg-brand text-brand-foreground"
-                    : "border-border bg-surface text-foreground/70 hover:bg-brand-soft"
-                }`}
-              >
-                {c === "all" && <Filter className="mr-1 inline h-3 w-3" />}
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Error */}
-        {error && !loading && (
-          <div className="rounded-2xl bg-emergency/10 p-3 text-sm text-emergency">{error}</div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center gap-2 rounded-2xl bg-surface p-6 text-sm text-muted-foreground shadow-card">
-            <Loader2 className="h-4 w-4 animate-spin" /> Finding safe places near you…
-          </div>
-        )}
-
-        {/* List */}
-        {!loading && filtered.length > 0 && (
-          <ul className="space-y-3">
-            {filtered.map((p) => {
-              const meta = CATEGORY_META[p.category];
-              const km = p.distanceKm < 1 ? `${Math.round(p.distanceKm * 1000)} m` : `${p.distanceKm.toFixed(1)} km`;
-              const mins = walkMinutes(p.distanceKm);
-              const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
-              return (
-                <li key={p.id} className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
-                  <div className="flex items-start gap-3">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.color}`}>
-                      <MapPin className="h-5 w-5" />
+              <li key={p.id} className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+                <div className="flex items-start gap-3">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.color}`}>
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold">{p.name}</div>
+                        <div className="text-xs text-muted-foreground">{meta.label}</div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-sm font-semibold text-brand">{km}</div>
+                        <div className="text-[11px] text-muted-foreground">~{mins} min</div>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="truncate font-semibold">{p.name}</div>
-                          <div className="text-xs text-muted-foreground">{meta.label}</div>
-                        </div>
-                        <div className="shrink-0 text-right">
-                          <div className="text-sm font-semibold text-brand">{km}</div>
-                          <div className="text-[11px] text-muted-foreground">~{mins} min</div>
-                        </div>
-                      </div>
-                      <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                        {p.address ?? "Address not listed. Use directions to navigate."}
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <Button asChild variant="brand" size="sm">
-                          <a href={mapsUrl} target="_blank" rel="noreferrer">
-                            <Navigation className="h-4 w-4" /> Directions
+                    <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                      {p.address ?? "Address not listed. Use directions to navigate."}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button asChild variant="brand" size="sm">
+                        <a href={mapsUrl} target="_blank" rel="noreferrer">
+                          <Navigation className="h-4 w-4" /> Directions
+                        </a>
+                      </Button>
+                      {p.phone ? (
+                        <Button asChild variant="outline" size="sm">
+                          <a href={`tel:${p.phone.replace(/\s+/g, "")}`}>
+                            <Phone className="h-4 w-4" /> Call
                           </a>
                         </Button>
-                        {p.phone ? (
-                          <Button asChild variant="outline" size="sm">
-                            <a href={`tel:${p.phone.replace(/\s+/g, "")}`}>
-                              <Phone className="h-4 w-4" /> Call
-                            </a>
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toast.info("Phone not listed. Try 112 for emergency assistance.")}
-                          >
-                            <Phone className="h-4 w-4" /> No number
-                          </Button>
-                        )}
-                        <Button asChild variant="ghost" size="sm">
-                          <a href={`https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lng}#map=17/${p.lat}/${p.lng}`} target="_blank" rel="noreferrer">
-                            Open map
-                          </a>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toast.info("Phone not listed. Try 112 for emergency assistance.")}
+                        >
+                          <Phone className="h-4 w-4" /> No number
                         </Button>
-                      </div>
+                      )}
+                      <Button asChild variant="ghost" size="sm">
+                        <a href={gmapsView} target="_blank" rel="noreferrer">Open in Maps</a>
+                      </Button>
                     </div>
                   </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-        {!loading && !error && filtered.length === 0 && places.length > 0 && (
-          <div className="rounded-2xl bg-surface p-6 text-center text-sm text-muted-foreground shadow-card">
-            No places match your filters. Try clearing the search or picking "All".
-          </div>
-        )}
-
-        {!pos && !loading && (
-          <div className="rounded-2xl bg-brand-soft p-4 text-sm text-foreground/80">
-            We need your location to show safe places nearby. In an emergency call{" "}
-            <a href="tel:112" className="font-semibold text-emergency underline">112</a>.
-          </div>
-        )}
-      </main>
-    </div>
+      {!loading && !errorMsg && filtered.length === 0 && places.length > 0 && (
+        <div className="rounded-2xl bg-surface p-6 text-center text-sm text-muted-foreground shadow-card">
+          No places match your filters. Try clearing the search or picking "All".
+        </div>
+      )}
+    </main>
   );
 }
