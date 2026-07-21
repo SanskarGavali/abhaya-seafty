@@ -224,7 +224,19 @@ function SosPage() {
     else { const ok = await enableTorch(); setTorchOn(ok); setTorchSupported(ok); if (!ok) toast.info("Flashlight not supported on this device"); }
   };
 
-  const callNumber = (phone: string) => { window.location.href = `tel:${phone.replace(/\s+/g, "")}`; };
+  const callNumber = (phone: string) => {
+    // Use a real anchor click so Android fires ACTION_DIAL directly to the
+    // phone dialer instead of the generic chooser some browsers open for
+    // `window.location.href = "tel:..."`.
+    const tel = `tel:${phone.replace(/[^\d+*#]/g, "")}`;
+    const a = document.createElement("a");
+    a.href = tel;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
   const callPrimary = () => contacts[0] ? callNumber(contacts[0].phone) : callNumber("112");
 
   const alertAll = async () => {
