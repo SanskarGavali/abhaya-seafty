@@ -108,50 +108,77 @@ export type Database = {
       }
       incident_reports: {
         Row: {
+          accuracy_m: number | null
           address: string | null
           category: string
+          contacts_notified: Json
           created_at: string
           description: string | null
+          device_info: Json | null
           id: string
           is_anonymous: boolean
           is_emergency: boolean
           latitude: number | null
           longitude: number | null
           media_paths: string[] | null
+          network_status: string | null
+          notes: string | null
+          recording_key: string | null
+          recording_path: string | null
+          recording_status: string
           status: string
           submitted_at: string | null
+          trigger_method: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          accuracy_m?: number | null
           address?: string | null
           category: string
+          contacts_notified?: Json
           created_at?: string
           description?: string | null
+          device_info?: Json | null
           id?: string
           is_anonymous?: boolean
           is_emergency?: boolean
           latitude?: number | null
           longitude?: number | null
           media_paths?: string[] | null
+          network_status?: string | null
+          notes?: string | null
+          recording_key?: string | null
+          recording_path?: string | null
+          recording_status?: string
           status?: string
           submitted_at?: string | null
+          trigger_method?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          accuracy_m?: number | null
           address?: string | null
           category?: string
+          contacts_notified?: Json
           created_at?: string
           description?: string | null
+          device_info?: Json | null
           id?: string
           is_anonymous?: boolean
           is_emergency?: boolean
           latitude?: number | null
           longitude?: number | null
           media_paths?: string[] | null
+          network_status?: string | null
+          notes?: string | null
+          recording_key?: string | null
+          recording_path?: string | null
+          recording_status?: string
           status?: string
           submitted_at?: string | null
+          trigger_method?: string | null
           updated_at?: string
           user_id?: string
         }
