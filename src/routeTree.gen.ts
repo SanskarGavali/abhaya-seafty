@@ -26,6 +26,7 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
 import { Route as AuthenticatedLiveLocationRouteImport } from './routes/_authenticated/live-location'
 import { Route as AuthenticatedLearnRouteImport } from './routes/_authenticated/learn'
+import { Route as AuthenticatedIncidentsRouteImport } from './routes/_authenticated/incidents'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticated/helpline'
 import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
@@ -123,6 +124,11 @@ const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
   path: '/learn',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIncidentsRoute = AuthenticatedIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/harassment': typeof AuthenticatedHarassmentRoute
   '/helpline': typeof AuthenticatedHelplineRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/incidents': typeof AuthenticatedIncidentsRoute
   '/learn': typeof AuthenticatedLearnRoute
   '/live-location': typeof AuthenticatedLiveLocationRoute
   '/map': typeof AuthenticatedMapRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/harassment': typeof AuthenticatedHarassmentRoute
   '/helpline': typeof AuthenticatedHelplineRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/incidents': typeof AuthenticatedIncidentsRoute
   '/learn': typeof AuthenticatedLearnRoute
   '/live-location': typeof AuthenticatedLiveLocationRoute
   '/map': typeof AuthenticatedMapRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/_authenticated/harassment': typeof AuthenticatedHarassmentRoute
   '/_authenticated/helpline': typeof AuthenticatedHelplineRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/incidents': typeof AuthenticatedIncidentsRoute
   '/_authenticated/learn': typeof AuthenticatedLearnRoute
   '/_authenticated/live-location': typeof AuthenticatedLiveLocationRoute
   '/_authenticated/map': typeof AuthenticatedMapRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/harassment'
     | '/helpline'
     | '/home'
+    | '/incidents'
     | '/learn'
     | '/live-location'
     | '/map'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/harassment'
     | '/helpline'
     | '/home'
+    | '/incidents'
     | '/learn'
     | '/live-location'
     | '/map'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/_authenticated/harassment'
     | '/_authenticated/helpline'
     | '/_authenticated/home'
+    | '/_authenticated/incidents'
     | '/_authenticated/learn'
     | '/_authenticated/live-location'
     | '/_authenticated/map'
@@ -481,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/incidents': {
+      id: '/_authenticated/incidents'
+      path: '/incidents'
+      fullPath: '/incidents'
+      preLoaderRoute: typeof AuthenticatedIncidentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -565,6 +584,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHarassmentRoute: typeof AuthenticatedHarassmentRoute
   AuthenticatedHelplineRoute: typeof AuthenticatedHelplineRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedIncidentsRoute: typeof AuthenticatedIncidentsRoute
   AuthenticatedLearnRoute: typeof AuthenticatedLearnRoute
   AuthenticatedLiveLocationRoute: typeof AuthenticatedLiveLocationRoute
   AuthenticatedMapRoute: typeof AuthenticatedMapRoute
@@ -589,6 +609,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHarassmentRoute: AuthenticatedHarassmentRoute,
   AuthenticatedHelplineRoute: AuthenticatedHelplineRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedIncidentsRoute: AuthenticatedIncidentsRoute,
   AuthenticatedLearnRoute: AuthenticatedLearnRoute,
   AuthenticatedLiveLocationRoute: AuthenticatedLiveLocationRoute,
   AuthenticatedMapRoute: AuthenticatedMapRoute,

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, Phone, MapPin, Share2, X, Volume2, VolumeX, Zap, ZapOff, Users, PhoneCall } from "lucide-react";
+import { AlertTriangle, Phone, MapPin, Share2, X, Volume2, VolumeX, Zap, ZapOff, Users, PhoneCall, Mic, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,11 @@ import { enableTorch, disableTorch } from "@/lib/torch";
 import { shareEmergency } from "@/lib/share";
 import { formatAccuracy } from "@/lib/geo";
 import { mapPositionError, friendlyGeoError } from "@/lib/location";
+import { collectDeviceInfo, networkStatus } from "@/lib/incident-report";
+import {
+  createRecordingLink, flushRecordingQueue, recordingSupported, saveRecording, startRecording,
+  type RecorderHandle,
+} from "@/lib/recording";
 
 export const Route = createFileRoute("/_authenticated/sos")({
   head: () => ({ meta: [{ title: "Emergency SOS — Abhaya" }, { name: "robots", content: "noindex" }] }),
@@ -16,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/sos")({
 
 type Contact = { id: string; name: string; phone: string; priority: number };
 type Pos = { lat: number; lng: number; accuracy: number };
+type RecStatus = "none" | "unsupported" | "denied" | "recording" | "queued" | "uploaded" | "failed";
+
 
 function SosPage() {
   const navigate = useNavigate();
@@ -27,6 +34,8 @@ function SosPage() {
   const [siren, setSiren] = useState(true);
   const [torchOn, setTorchOn] = useState(false);
   const [torchSupported, setTorchSupported] = useState(true);
+  const [recStatus, setRecStatus] = useState<RecStatus>("none");
+  const [lastIncidentId, setLastIncidentId] = useState<string | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const oscRefs = useRef<OscillatorNode[]>([]);
@@ -36,8 +45,21 @@ function SosPage() {
   const watchRef = useRef<number | null>(null);
   const tickRef = useRef<number | null>(null);
   const posRef = useRef<Pos | null>(null);
+  const recorderRef = useRef<RecorderHandle | null>(null);
+  const incidentIdRef = useRef<string | null>(null);
+  const contactsRef = useRef<Contact[]>([]);
 
   useEffect(() => { posRef.current = pos; }, [pos]);
+  useEffect(() => { contactsRef.current = contacts; }, [contacts]);
+
+  // Upload anything the offline queue is still holding on to.
+  useEffect(() => {
+    flushRecordingQueue();
+    const onOnline = () => { flushRecordingQueue(); };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, []);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -162,20 +184,30 @@ function SosPage() {
       .catch(() => { /* noop */ });
   }, [startGeo]);
 
-  const logIncident = async (lat: number | null, lng: number | null) => {
+  // Creates the automatic incident report row and returns its id.
+  const logIncident = async (lat: number | null, lng: number | null, accuracy: number | null) => {
     const { data: userData } = await supabase.auth.getUser();
     const uid = userData.user?.id;
-    if (!uid) return;
-    await supabase.from("incident_reports").insert({
+    if (!uid) return null;
+    const { data, error } = await supabase.from("incident_reports").insert({
       user_id: uid,
       category: "sos",
       description: "Emergency SOS activated from device.",
       latitude: lat,
       longitude: lng,
+      accuracy_m: accuracy,
       status: "active",
       is_emergency: true,
       submitted_at: new Date().toISOString(),
-    });
+      device_info: collectDeviceInfo() as unknown as never,
+      trigger_method: "Manual SOS button",
+      network_status: networkStatus(),
+      recording_status: recordingSupported() ? "recording" : "unsupported",
+    }).select("id").single();
+    if (error || !data) return null;
+    incidentIdRef.current = data.id;
+    setLastIncidentId(data.id);
+    return data.id;
   };
 
   const tryTorch = useCallback(async () => {
@@ -184,15 +216,48 @@ function SosPage() {
     setTorchOn(ok);
   }, []);
 
+  const beginRecording = useCallback(async () => {
+    if (!recordingSupported()) { setRecStatus("unsupported"); return; }
+    const handle = await startRecording();
+    if (!handle) { setRecStatus("denied"); return; }
+    recorderRef.current = handle;
+    setRecStatus("recording");
+  }, []);
+
+  const finishRecording = useCallback(async () => {
+    const handle = recorderRef.current;
+    recorderRef.current = null;
+    if (!handle) return;
+    const blob = await handle.stop();
+    if (!blob || blob.size === 0) { setRecStatus("failed"); return; }
+    const { data: userData } = await supabase.auth.getUser();
+    const uid = userData.user?.id;
+    if (!uid) { setRecStatus("failed"); return; }
+    const res = await saveRecording(blob, uid, incidentIdRef.current);
+    setRecStatus(res.status === "uploaded" ? "uploaded" : res.status === "queued" ? "queued" : "failed");
+    if (incidentIdRef.current && res.status !== "uploaded") {
+      await supabase.from("incident_reports")
+        .update({ recording_status: res.status })
+        .eq("id", incidentIdRef.current);
+    }
+    if (res.status === "uploaded") toast.success("Emergency recording encrypted and saved securely");
+    else toast.info("Recording saved on this device — it will upload automatically when you're back online");
+  }, []);
+
   const activate = async () => {
     setActive(true);
     setSeconds(0);
+    try { sessionStorage.setItem("abhaya:sosActive", "1"); } catch { /* noop */ }
     tickRef.current = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     if (siren) startSiren();
     requestWakeLock();
     startGeo();
     tryTorch();
-    setTimeout(() => logIncident(posRef.current?.lat ?? null, posRef.current?.lng ?? null), 1500);
+    beginRecording();
+    setTimeout(
+      () => logIncident(posRef.current?.lat ?? null, posRef.current?.lng ?? null, posRef.current?.accuracy ?? null),
+      1500,
+    );
     toast.error("SOS Active — help is on the way", { duration: 3000 });
   };
 
@@ -200,13 +265,23 @@ function SosPage() {
     setActive(false);
     if (tickRef.current) clearInterval(tickRef.current);
     tickRef.current = null;
+    try { sessionStorage.removeItem("abhaya:sosActive"); } catch { /* noop */ }
     stopSiren();
     // Keep GPS watch alive so re-activation is instant; it stops on unmount.
     releaseWakeLock();
     disableTorch();
     setTorchOn(false);
-    toast.success("SOS deactivated");
-  }, [releaseWakeLock, stopSiren]);
+    finishRecording();
+    const id = incidentIdRef.current;
+    if (id) {
+      supabase.from("incident_reports")
+        .update({ status: "resolved", network_status: networkStatus() })
+        .eq("id", id)
+        .then(() => { /* noop */ });
+    }
+    toast.success("SOS deactivated — incident report saved");
+  }, [finishRecording, releaseWakeLock, stopSiren]);
+
 
   useEffect(() => () => {
     stopSiren(); stopGeo(); releaseWakeLock(); disableTorch();
@@ -239,17 +314,63 @@ function SosPage() {
   };
   const callPrimary = () => contacts[0] ? callNumber(contacts[0].phone) : callNumber("112");
 
+  // Records who was actually reached (or attempted) on the incident report.
+  const recordNotified = async (entries: Array<{ name: string; phone: string; method: string }>) => {
+    const id = incidentIdRef.current;
+    if (!id) return;
+    await supabase.from("incident_reports")
+      .update({ contacts_notified: entries as unknown as never })
+      .eq("id", id);
+  };
+
   const alertAll = async () => {
-    const phones = contacts.map((c) => c.phone);
-    if (phones.length === 0) {
+    const ordered = contactsRef.current.slice().sort((a, b) => a.priority - b.priority);
+    if (ordered.length === 0) {
       toast.error("No emergency contacts saved. Add contacts to enable Alert All.");
       return;
     }
-    const r = await shareEmergency(pos, phones);
-    if (r === "shared" || r === "sms") toast.success("Emergency message ready to send");
-    else if (r === "copied") toast.success("Location copied — paste in your messages");
-    else toast.error("Could not share automatically — try Share location");
+
+    // Priority evidence sharing: the primary contact goes first, with a private
+    // link to the recording when one has actually been uploaded.
+    let evidenceLink: string | null = null;
+    const id = incidentIdRef.current;
+    if (id && recStatus === "uploaded") {
+      const { data } = await supabase.from("incident_reports").select("recording_path").eq("id", id).single();
+      if (data?.recording_path) evidenceLink = await createRecordingLink(data.recording_path);
+    }
+
+    const primary = ordered[0]!;
+    const rest = ordered.slice(1);
+    const suffix = evidenceLink ? `\n\nEmergency audio recording (private link): ${evidenceLink}` : "";
+
+    const share = async (phones: string[]) => shareEmergency(pos, phones, undefined, suffix);
+
+
+    const r1 = await share([primary.phone]);
+    const notified = [{ name: primary.name, phone: primary.phone, method: r1 }];
+
+    if (rest.length > 0) {
+      const r2 = await share(rest.map((c) => c.phone));
+      rest.forEach((c) => notified.push({ name: c.name, phone: c.phone, method: r2 }));
+    }
+    recordNotified(notified);
+
+    if (r1 === "shared" || r1 === "sms") {
+      toast.success(
+        evidenceLink
+          ? `Alert prepared for ${primary.name} first, with the recording link${rest.length ? ", then the rest" : ""}`
+          : `Alert prepared for ${primary.name} first${rest.length ? ", then the rest" : ""}`,
+      );
+    } else if (r1 === "copied") {
+      toast.success("Emergency message copied — paste it to your contacts");
+    } else {
+      toast.error("Could not share automatically — use Share location");
+    }
+    if (recStatus === "recording" || recStatus === "queued") {
+      toast.info("The recording is still being secured — it can be shared from Incident Reports once uploaded.");
+    }
   };
+
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
@@ -306,7 +427,24 @@ function SosPage() {
                 </ol>
               )}
             </div>
+
+            <div className="rounded-2xl bg-surface p-4 ring-1 ring-border/60">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Mic className="h-3.5 w-3.5" /> Emergency recording
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {recordingSupported()
+                  ? "Audio recording starts automatically with SOS. It is encrypted on your device before upload, and only you can open it."
+                  : "Audio recording isn't supported by this browser. Everything else in SOS still works."}
+              </p>
+              {(recStatus === "queued" || recStatus === "uploaded" || lastIncidentId) && (
+                <button className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand underline" onClick={() => navigate({ to: "/incidents" })}>
+                  <FileText className="h-4 w-4" /> View incident reports
+                </button>
+              )}
+            </div>
           </div>
+
         ) : (
           <div className="space-y-4 pt-2">
             <div className="rounded-3xl bg-white/15 p-5 backdrop-blur-sm">
@@ -319,7 +457,18 @@ function SosPage() {
               ) : (
                 <div className="mt-1 text-sm opacity-90">{geoError ? geoError : "Acquiring GPS fix…"}</div>
               )}
+              <div className="mt-3 flex items-center gap-2 border-t border-white/20 pt-2 text-xs opacity-90">
+                <Mic className="h-3.5 w-3.5" />
+                {recStatus === "recording" ? "Recording audio (encrypted on device)"
+                  : recStatus === "denied" ? "Microphone permission denied — recording off"
+                  : recStatus === "unsupported" ? "Recording not supported on this browser"
+                  : recStatus === "queued" ? "Recording saved on device — will upload when online"
+                  : recStatus === "uploaded" ? "Recording uploaded securely"
+                  : "Starting recording…"}
+              </div>
             </div>
+
+
 
             <div className="grid grid-cols-2 gap-3">
               <Button variant="glass" size="lg" onClick={callPrimary} className="!bg-white/95 !text-emergency">

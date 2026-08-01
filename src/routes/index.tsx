@@ -14,6 +14,22 @@ function Splash() {
   const [lang] = useLanguage();
 
   useEffect(() => {
+    // Password-recovery links sometimes land on "/" (Site URL) instead of the
+    // configured redirect. Forward them, preserving the token in query/hash.
+    if (typeof window !== "undefined") {
+      const { search, hash } = window.location;
+      const params = new URLSearchParams(search);
+      const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+      const isRecovery =
+        params.get("type") === "recovery" ||
+        hashParams.get("type") === "recovery" ||
+        params.has("token_hash") ||
+        params.has("code");
+      if (isRecovery) {
+        window.location.replace(`/reset-password${search}${hash}`);
+        return;
+      }
+    }
     const timer = setTimeout(async () => {
       const stored = getStoredLanguage();
       const { data } = await supabase.auth.getSession();

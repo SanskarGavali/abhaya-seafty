@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatAccuracy } from "@/lib/geo";
 import { toast } from "sonner";
+import { cacheGet, cacheSet } from "@/lib/offline-cache";
+
 
 export const Route = createFileRoute("/_authenticated/map")({
   head: () => ({ meta: [{ title: "Safe Places Nearby — Abhaya" }] }),
@@ -53,6 +55,13 @@ const CATEGORY_META: Record<Category, { label: string; short: string; priority: 
 };
 
 const LAST_LOC_KEY = "abhaya:lastKnownLocation";
+const PLACES_TTL_MS = 30 * 60 * 1000; // 30 minutes before we re-query Overpass
+
+/** Cache bucket ~1.1 km so small movements reuse the same saved results. */
+function placesCacheKey(lat: number, lng: number, radiusKm: number) {
+  return `abhaya:places:${lat.toFixed(2)}:${lng.toFixed(2)}:${radiusKm}`;
+}
+
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -115,11 +124,50 @@ class PlacesError extends Error {
   }
 }
 
+type OverpassEl = { id: number; type: string; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> };
+
+function parseElements(elements: OverpassEl[], lat: number, lng: number): Place[] {
+  const seen = new Set<string>();
+  const out: Place[] = [];
+  for (const el of elements ?? []) {
+    const tags = el.tags ?? {};
+    const cat = classify(tags);
+    if (!cat) continue;
+    const plat = el.lat ?? el.center?.lat;
+    const plng = el.lon ?? el.center?.lon;
+    if (plat == null || plng == null) continue;
+    const id = `${el.type}/${el.id}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const name = tags.name || tags["name:en"] || CATEGORY_META[cat].label;
+    const addressParts = [tags["addr:housenumber"], tags["addr:street"], tags["addr:suburb"], tags["addr:city"]].filter(Boolean);
+    out.push({
+      id, name, category: cat,
+      lat: plat, lng: plng,
+      address: addressParts.length ? addressParts.join(", ") : undefined,
+      phone: tags.phone || tags["contact:phone"] || undefined,
+      distanceKm: haversineKm(lat, lng, plat, plng),
+    });
+  }
+  return out;
+}
+
+const ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.openstreetmap.ru/api/interpreter",
+];
+
+/**
+ * Performance: all mirrors are queried in parallel and the FIRST successful
+ * response wins (Overpass mirrors vary from 1s to 20s). Timeout is 9s per
+ * mirror instead of 18s serial-per-mirror, so worst case is ~9s not ~54s.
+ */
 async function fetchNearby(
   lat: number, lng: number, radiusM: number, signal: AbortSignal,
 ): Promise<Place[]> {
   const query = `
-    [out:json][timeout:20];
+    [out:json][timeout:12];
     (
       node["amenity"~"police|hospital|clinic|fire_station|pharmacy|bus_station|fuel|atm|bank|college|university|library|townhall|place_of_worship"](around:${radiusM},${lat},${lng});
       way["amenity"~"police|hospital|fire_station|bus_station|college|university|library|townhall"](around:${radiusM},${lat},${lng});
@@ -134,68 +182,45 @@ async function fetchNearby(
     out center tags 200;
   `.trim();
 
-  const endpoints = [
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.openstreetmap.ru/api/interpreter",
-  ];
+  const kinds: Array<"network" | "timeout" | "server" | "unknown"> = [];
 
-  let lastKind: "network" | "timeout" | "server" | "unknown" = "unknown";
-  for (const url of endpoints) {
-    if (signal.aborted) throw new PlacesError("unknown", "cancelled");
-    try {
-      // Per-endpoint timeout via a linked AbortController so failing
-      // endpoint doesn't cascade into a real user-visible abort.
+  const attempt = (url: string) =>
+    new Promise<Place[]>((resolve, reject) => {
       const local = new AbortController();
       const onOuter = () => local.abort();
       signal.addEventListener("abort", onOuter);
-      const timer = setTimeout(() => local.abort(), 18000);
+      const timer = setTimeout(() => local.abort(), 9000);
+      const cleanup = () => { clearTimeout(timer); signal.removeEventListener("abort", onOuter); };
 
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          body: `data=${encodeURIComponent(query)}`,
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          signal: local.signal,
+      fetch(url, {
+        method: "POST",
+        body: `data=${encodeURIComponent(query)}`,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        signal: local.signal,
+        keepalive: false,
+      })
+        .then(async (res) => {
+          if (!res.ok) { kinds.push(res.status >= 500 ? "server" : "network"); throw new Error("bad status"); }
+          const data = (await res.json()) as { elements: OverpassEl[] };
+          cleanup();
+          resolve(parseElements(data.elements ?? [], lat, lng));
+        })
+        .catch((e: Error) => {
+          cleanup();
+          if (!signal.aborted) kinds.push(e?.name === "AbortError" ? "timeout" : "network");
+          reject(e);
         });
-        if (!res.ok) { lastKind = res.status >= 500 ? "server" : "network"; continue; }
-        const data = (await res.json()) as { elements: Array<{ id: number; type: string; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }> };
-        const seen = new Set<string>();
-        const out: Place[] = [];
-        for (const el of data.elements ?? []) {
-          const tags = el.tags ?? {};
-          const cat = classify(tags);
-          if (!cat) continue;
-          const plat = el.lat ?? el.center?.lat;
-          const plng = el.lon ?? el.center?.lon;
-          if (plat == null || plng == null) continue;
-          const id = `${el.type}/${el.id}`;
-          if (seen.has(id)) continue;
-          seen.add(id);
-          const name = tags.name || tags["name:en"] || CATEGORY_META[cat].label;
-          const addressParts = [tags["addr:housenumber"], tags["addr:street"], tags["addr:suburb"], tags["addr:city"]].filter(Boolean);
-          out.push({
-            id, name, category: cat,
-            lat: plat, lng: plng,
-            address: addressParts.length ? addressParts.join(", ") : undefined,
-            phone: tags.phone || tags["contact:phone"] || undefined,
-            distanceKm: haversineKm(lat, lng, plat, plng),
-          });
-        }
-        return out;
-      } finally {
-        clearTimeout(timer);
-        signal.removeEventListener("abort", onOuter);
-      }
-    } catch (e) {
-      if (signal.aborted) throw new PlacesError("unknown", "cancelled");
-      const name = (e as Error)?.name;
-      if (name === "AbortError") { lastKind = "timeout"; continue; }
-      lastKind = "network";
-    }
+    });
+
+  try {
+    return await Promise.any(ENDPOINTS.map(attempt));
+  } catch {
+    if (signal.aborted) throw new PlacesError("unknown", "cancelled");
+    const kind = kinds.includes("timeout") ? "timeout" : kinds.includes("network") ? "network" : kinds[0] ?? "unknown";
+    throw new PlacesError(kind, "all endpoints failed");
   }
-  throw new PlacesError(lastKind, "all endpoints failed");
 }
+
 
 function walkMinutes(km: number): number {
   return Math.max(1, Math.round((km / 5) * 60));
@@ -255,22 +280,43 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
     };
   }, []);
 
-  const loadPlaces = useCallback(async (lat: number, lng: number, radius: number) => {
+  const loadPlaces = useCallback(async (lat: number, lng: number, radius: number, force = false) => {
+    // 1) Instant paint from cache (also what keeps the screen usable offline).
+    const key = placesCacheKey(lat, lng, radius);
+    const cached = cacheGet<Place[]>(key);
+    if (cached?.value?.length) {
+      setPlaces(cached.value.map((p: Place) => ({ ...p, distanceKm: haversineKm(lat, lng, p.lat, p.lng) })));
+      lastRefreshLoc.current = { lat, lng };
+      setLoading(false);
+      // Fresh enough? Skip the network entirely.
+      if (!force && cached.ageMs < PLACES_TTL_MS) return;
+    }
+
+    if (!navigator.onLine) {
+      if (!cached?.value?.length) {
+        setErrorMsg("You're offline and we have no saved places for this area yet. Emergency SOS and calling still work.");
+      }
+      setLoading(false);
+      return;
+    }
+
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
-    setLoading(true);
+    if (!cached?.value?.length) setLoading(true);
     setErrorMsg(null);
     try {
       const results = await fetchNearby(lat, lng, radius * 1000, ctrl.signal);
       if (ctrl.signal.aborted) return;
       setPlaces(results);
+      cacheSet(key, results);
       lastRefreshLoc.current = { lat, lng };
       if (results.length === 0) {
         setErrorMsg(`No safe places found within ${radius} km. Try a wider search.`);
       }
     } catch (e) {
       if (ctrl.signal.aborted) return; // silent, superseded
+      if (cached?.value?.length) return; // we already show saved results
       const kind = (e as PlacesError).kind;
       if (kind === "timeout") {
         setErrorMsg("Loading is taking longer than expected. Please check your connection and try again.");
@@ -284,6 +330,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
       if (!ctrl.signal.aborted) setLoading(false);
     }
   }, []);
+
 
   // Initial fetch + refetch when user moves > 300 m.
   useEffect(() => {

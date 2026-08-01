@@ -13,8 +13,11 @@ export function emergencyMessage(pos: SharePos | null, name?: string): string {
   )}m). Please call me immediately.`;
 }
 
-export async function shareEmergency(pos: SharePos | null, phones: string[], name?: string) {
-  const text = emergencyMessage(pos, name);
+export async function shareEmergency(
+  pos: SharePos | null, phones: string[], name?: string, extra?: string,
+) {
+  const text = emergencyMessage(pos, name) + (extra ?? "");
+
   const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
   if (nav.share) {
     try {
