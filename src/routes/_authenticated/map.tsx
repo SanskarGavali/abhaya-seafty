@@ -356,7 +356,8 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
 
   const refresh = () => {
     setErrorMsg(null);
-    loadPlaces(pos.lat, pos.lng, radiusKm);
+    loadPlaces(pos.lat, pos.lng, radiusKm, true);
+
   };
 
   const filtered = useMemo(() => {
