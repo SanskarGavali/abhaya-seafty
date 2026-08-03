@@ -210,6 +210,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           emergency_message: string | null
+          firebase_uid: string | null
           full_name: string | null
           id: string
           phone: string | null
@@ -219,6 +220,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           emergency_message?: string | null
+          firebase_uid?: string | null
           full_name?: string | null
           id: string
           phone?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           emergency_message?: string | null
+          firebase_uid?: string | null
           full_name?: string | null
           id?: string
           phone?: string | null
