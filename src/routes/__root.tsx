@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
+import { TempPrankSecurityError } from "@/components/app/TempPrankSecurityError"; // TEMP_PRANK_SECURITY_ERROR
 
 function NotFoundComponent() {
   return (
@@ -128,6 +129,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <Toaster position="top-center" richColors closeButton />
+      <TempPrankSecurityError /> {/* TEMP_PRANK_SECURITY_ERROR */}
     </QueryClientProvider>
   );
 }
