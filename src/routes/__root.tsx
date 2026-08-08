@@ -129,6 +129,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <Toaster position="top-center" richColors closeButton />
+      <TempPrankSecurityError /> {/* TEMP_PRANK_SECURITY_ERROR */}
     </QueryClientProvider>
   );
 }
