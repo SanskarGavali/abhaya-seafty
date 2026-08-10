@@ -272,13 +272,39 @@ function VideoEvidencePage() {
                   <Button size="sm" variant="outline" onClick={() => downloadVideo(v)}>
                     <Download className="h-4 w-4" /> Download
                   </Button>
-                  <Button size="sm" variant="brand" disabled={busy === v.id} onClick={() => send(v)}>
+                  {!isMp4(v.mime) && (
+                    <Button size="sm" variant="outline" disabled={busy === v.id} onClick={() => void downloadMp4(v)}>
+                      <Download className="h-4 w-4" /> Download MP4
+                    </Button>
+                  )}
+                  <Button size="sm" variant="brand" disabled={busy === v.id} onClick={() => void send(v)}>
                     <Send className="h-4 w-4" /> Send Video
                   </Button>
+                  {noShare[v.id] && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(WHATSAPP_CONTACT_URL, "_blank", "noopener,noreferrer")}
+                    >
+                      <Send className="h-4 w-4" /> Share via WhatsApp
+                    </Button>
+                  )}
                   <Button size="sm" variant="ghost" onClick={() => remove(v)}>
                     <Trash2 className="h-4 w-4" /> Delete
                   </Button>
                 </div>
+
+                {progress?.id === v.id && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Converting to MP4 for WhatsApp… {progress.pct}%
+                  </p>
+                )}
+                {noShare[v.id] && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    This browser can’t attach files directly. Download the MP4, then attach it in WhatsApp.
+                  </p>
+                )}
+
               </li>
             ))}
           </ul>
