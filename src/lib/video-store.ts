@@ -104,26 +104,34 @@ export function formatDuration(ms: number): string {
 }
 
 export function downloadVideo(v: StoredVideo): void {
-  const url = URL.createObjectURL(v.blob);
+  downloadBlobAs(v.blob, videoFileName(v));
+}
+
+export function downloadBlobAs(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = videoFileName(v);
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
+/** Same base name as the stored recording but with an .mp4 extension. */
+export function mp4FileName(v: VideoMeta): string {
+  return videoFileName(v).replace(/\.[a-z0-9]+$/i, "") + ".mp4";
+}
+
 export const WHATSAPP_CONTACT_URL = "https://wa.me/qr/MNKSIEOB4GCDP1";
 
 /**
- * Shares the recorded video. Never uploads anywhere — it hands the file to the
+ * Shares a video file. Never uploads anywhere — it hands the file to the
  * OS share sheet so the user picks WhatsApp and presses Send themselves.
- * Falls back to downloading + opening the WhatsApp contact when the browser
- * cannot share files. The local copy is always kept.
+ * Returns "unsupported" when the browser cannot share files, so the caller
+ * can offer Download + Open WhatsApp instead. The local copy is always kept.
  */
-export async function sendVideo(v: StoredVideo): Promise<"shared" | "cancelled" | "fallback"> {
-  const file = toVideoFile(v);
+export async function shareVideoFile(file: File): Promise<"shared" | "cancelled" | "unsupported"> {
   const nav = navigator as Navigator & {
     share?: (d: ShareData) => Promise<void>;
     canShare?: (d: ShareData) => boolean;
@@ -142,7 +150,15 @@ export async function sendVideo(v: StoredVideo): Promise<"shared" | "cancelled" 
       if (name === "AbortError") return "cancelled";
     }
   }
+  return "unsupported";
+}
+
+/** Backwards-compatible helper: shares the stored recording as-is. */
+export async function sendVideo(v: StoredVideo): Promise<"shared" | "cancelled" | "fallback"> {
+  const result = await shareVideoFile(toVideoFile(v));
+  if (result !== "unsupported") return result;
   downloadVideo(v);
   window.open(WHATSAPP_CONTACT_URL, "_blank", "noopener,noreferrer");
   return "fallback";
 }
+
