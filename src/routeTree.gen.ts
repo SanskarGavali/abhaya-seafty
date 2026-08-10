@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedZeroFirRouteImport } from './routes/_authenticated/zero-fir'
+import { Route as AuthenticatedVideoEvidenceRouteImport } from './routes/_authenticated/video-evidence'
 import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/sos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSchemesRouteImport } from './routes/_authenticated/schemes'
@@ -72,6 +73,12 @@ const AuthenticatedZeroFirRoute = AuthenticatedZeroFirRouteImport.update({
   path: '/zero-fir',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVideoEvidenceRoute =
+  AuthenticatedVideoEvidenceRouteImport.update({
+    id: '/video-evidence',
+    path: '/video-evidence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
   id: '/sos',
   path: '/sos',
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/schemes': typeof AuthenticatedSchemesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sos': typeof AuthenticatedSosRoute
+  '/video-evidence': typeof AuthenticatedVideoEvidenceRoute
   '/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRoutesByTo {
@@ -239,6 +247,7 @@ export interface FileRoutesByTo {
   '/schemes': typeof AuthenticatedSchemesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/sos': typeof AuthenticatedSosRoute
+  '/video-evidence': typeof AuthenticatedVideoEvidenceRoute
   '/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRoutesById {
@@ -270,6 +279,7 @@ export interface FileRoutesById {
   '/_authenticated/schemes': typeof AuthenticatedSchemesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/sos': typeof AuthenticatedSosRoute
+  '/_authenticated/video-evidence': typeof AuthenticatedVideoEvidenceRoute
   '/_authenticated/zero-fir': typeof AuthenticatedZeroFirRoute
 }
 export interface FileRouteTypes {
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/settings'
     | '/sos'
+    | '/video-evidence'
     | '/zero-fir'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/settings'
     | '/sos'
+    | '/video-evidence'
     | '/zero-fir'
   id:
     | '__root__'
@@ -360,6 +372,7 @@ export interface FileRouteTypes {
     | '/_authenticated/schemes'
     | '/_authenticated/settings'
     | '/_authenticated/sos'
+    | '/_authenticated/video-evidence'
     | '/_authenticated/zero-fir'
   fileRoutesById: FileRoutesById
 }
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/zero-fir'
       fullPath: '/zero-fir'
       preLoaderRoute: typeof AuthenticatedZeroFirRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/video-evidence': {
+      id: '/_authenticated/video-evidence'
+      path: '/video-evidence'
+      fullPath: '/video-evidence'
+      preLoaderRoute: typeof AuthenticatedVideoEvidenceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sos': {
@@ -595,6 +615,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSchemesRoute: typeof AuthenticatedSchemesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSosRoute: typeof AuthenticatedSosRoute
+  AuthenticatedVideoEvidenceRoute: typeof AuthenticatedVideoEvidenceRoute
   AuthenticatedZeroFirRoute: typeof AuthenticatedZeroFirRoute
 }
 
@@ -620,6 +641,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSchemesRoute: AuthenticatedSchemesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSosRoute: AuthenticatedSosRoute,
+  AuthenticatedVideoEvidenceRoute: AuthenticatedVideoEvidenceRoute,
   AuthenticatedZeroFirRoute: AuthenticatedZeroFirRoute,
 }
 
