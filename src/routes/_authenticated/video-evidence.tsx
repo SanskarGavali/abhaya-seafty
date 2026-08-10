@@ -146,14 +146,46 @@ function VideoEvidencePage() {
     toast.success("Video deleted from this device");
   };
 
+  /** Returns a WhatsApp-friendly MP4 for this recording (converting if needed). */
+  const getMp4 = async (v: StoredVideo): Promise<Blob | null> => {
+    if (isMp4(v.mime)) return v.blob;
+    const cached = mp4Cache.current.get(v.id);
+    if (cached) return cached;
+    setProgress({ id: v.id, pct: 0 });
+    const out = await convertToMp4(v.blob, (r) => setProgress({ id: v.id, pct: Math.round(r * 100) }));
+    setProgress(null);
+    if (out) mp4Cache.current.set(v.id, out);
+    return out;
+  };
+
+  const downloadMp4 = async (v: StoredVideo) => {
+    setBusy(v.id);
+    try {
+      const mp4 = await getMp4(v);
+      if (mp4) downloadBlobAs(mp4, mp4FileName(v));
+      else {
+        downloadVideo(v);
+        toast.info("Could not convert to MP4 — downloaded the original recording instead.");
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const send = async (v: StoredVideo) => {
     setBusy(v.id);
     try {
-      const result = await sendVideo(v);
-      if (result === "fallback") {
-        toast.info("Video saved on this device. Attach the downloaded video in WhatsApp.");
-      } else if (result === "shared") {
+      const mp4 = await getMp4(v);
+      const file = mp4
+        ? new File([mp4], mp4FileName(v), { type: "video/mp4" })
+        : toVideoFile(v);
+      if (!mp4) toast.info("MP4 conversion unavailable — sharing the original recording.");
+      const result = await shareVideoFile(file);
+      if (result === "shared") {
         toast.success("Share sheet opened — pick WhatsApp and press Send");
+      } else if (result === "unsupported") {
+        setNoShare((s) => ({ ...s, [v.id]: true }));
+        toast.info("This browser can't share files directly. Download the MP4, then attach it in WhatsApp.");
       }
     } catch {
       toast.error("Sharing failed — your video is still saved on this device");
@@ -161,6 +193,7 @@ function VideoEvidencePage() {
       setBusy(null);
     }
   };
+
 
   return (
     <div className="pb-24">
