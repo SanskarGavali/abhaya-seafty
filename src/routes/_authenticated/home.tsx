@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AlertTriangle, Home as HomeIcon, ShieldAlert, Hand, Shield, Phone, MapPin, MessageCircleHeart, ChevronRight, Sparkles } from "lucide-react";
+import { AlertTriangle, Home as HomeIcon, ShieldAlert, Hand, Shield, Phone, MapPin, MessageCircleHeart, ChevronRight, Sparkles, Video } from "lucide-react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { TileCard } from "@/components/app/TileCard";
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,7 @@ function HomePage() {
             <TileCard to="/cyber-safety" icon={Shield} label={t("cyberSafety", lang)} tone="brand" />
             <TileCard to="/helpline" icon={Phone} label={t("helplineNumbers", lang)} tone="pink" />
             <TileCard to="/map" icon={MapPin} label={t("safePlaces", lang)} tone="brand" />
+            <TileCard to="/video-evidence" icon={Video} label="Video Evidence" tone="pink" />
           </div>
         </section>
 
