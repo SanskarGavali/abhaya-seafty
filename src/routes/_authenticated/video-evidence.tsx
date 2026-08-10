@@ -27,18 +27,21 @@ export const Route = createFileRoute("/_authenticated/video-evidence")({
 function pickVideoMime(): string {
   const MR = (window as unknown as { MediaRecorder?: typeof MediaRecorder }).MediaRecorder;
   if (!MR) return "";
+  // Prefer MP4/H.264 when the browser can record it — WhatsApp rejects WebM.
   const candidates = [
+    "video/mp4;codecs=h264,aac",
+    "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+    "video/mp4",
     "video/webm;codecs=vp9,opus",
     "video/webm;codecs=vp8,opus",
     "video/webm",
-    "video/mp4;codecs=h264,aac",
-    "video/mp4",
   ];
   for (const c of candidates) {
     try { if (MR.isTypeSupported(c)) return c; } catch { /* noop */ }
   }
   return "";
 }
+
 
 function VideoEvidencePage() {
   const previewRef = useRef<HTMLVideoElement | null>(null);
