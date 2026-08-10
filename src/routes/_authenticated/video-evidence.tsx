@@ -58,6 +58,10 @@ function VideoEvidencePage() {
   const [videos, setVideos] = useState<StoredVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{ id: string; pct: number } | null>(null);
+  const [noShare, setNoShare] = useState<Record<string, boolean>>({});
+  const mp4Cache = useRef<Map<string, Blob>>(new Map());
+
 
   const refresh = useCallback(async () => setVideos(await listVideos()), []);
 
