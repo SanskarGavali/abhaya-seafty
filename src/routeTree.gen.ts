@@ -33,6 +33,7 @@ import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
 import { Route as AuthenticatedFollowingMeRouteImport } from './routes/_authenticated/following-me'
 import { Route as AuthenticatedFaqRouteImport } from './routes/_authenticated/faq'
+import { Route as AuthenticatedEvidenceRouteImport } from './routes/_authenticated/evidence'
 import { Route as AuthenticatedDomesticViolenceRouteImport } from './routes/_authenticated/domestic-violence'
 import { Route as AuthenticatedCyberSafetyRouteImport } from './routes/_authenticated/cyber-safety'
 import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
@@ -162,6 +163,11 @@ const AuthenticatedFaqRoute = AuthenticatedFaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEvidenceRoute = AuthenticatedEvidenceRouteImport.update({
+  id: '/evidence',
+  path: '/evidence',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDomesticViolenceRoute =
   AuthenticatedDomesticViolenceRouteImport.update({
     id: '/domestic-violence',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof AuthenticatedContactsRoute
   '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/evidence': typeof AuthenticatedEvidenceRoute
   '/faq': typeof AuthenticatedFaqRoute
   '/following-me': typeof AuthenticatedFollowingMeRoute
   '/harassment': typeof AuthenticatedHarassmentRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof AuthenticatedContactsRoute
   '/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/evidence': typeof AuthenticatedEvidenceRoute
   '/faq': typeof AuthenticatedFaqRoute
   '/following-me': typeof AuthenticatedFollowingMeRoute
   '/harassment': typeof AuthenticatedHarassmentRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/contacts': typeof AuthenticatedContactsRoute
   '/_authenticated/cyber-safety': typeof AuthenticatedCyberSafetyRoute
   '/_authenticated/domestic-violence': typeof AuthenticatedDomesticViolenceRoute
+  '/_authenticated/evidence': typeof AuthenticatedEvidenceRoute
   '/_authenticated/faq': typeof AuthenticatedFaqRoute
   '/_authenticated/following-me': typeof AuthenticatedFollowingMeRoute
   '/_authenticated/harassment': typeof AuthenticatedHarassmentRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/cyber-safety'
     | '/domestic-violence'
+    | '/evidence'
     | '/faq'
     | '/following-me'
     | '/harassment'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/cyber-safety'
     | '/domestic-violence'
+    | '/evidence'
     | '/faq'
     | '/following-me'
     | '/harassment'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contacts'
     | '/_authenticated/cyber-safety'
     | '/_authenticated/domestic-violence'
+    | '/_authenticated/evidence'
     | '/_authenticated/faq'
     | '/_authenticated/following-me'
     | '/_authenticated/harassment'
@@ -555,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFaqRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/evidence': {
+      id: '/_authenticated/evidence'
+      path: '/evidence'
+      fullPath: '/evidence'
+      preLoaderRoute: typeof AuthenticatedEvidenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/domestic-violence': {
       id: '/_authenticated/domestic-violence'
       path: '/domestic-violence'
@@ -599,6 +618,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContactsRoute: typeof AuthenticatedContactsRoute
   AuthenticatedCyberSafetyRoute: typeof AuthenticatedCyberSafetyRoute
   AuthenticatedDomesticViolenceRoute: typeof AuthenticatedDomesticViolenceRoute
+  AuthenticatedEvidenceRoute: typeof AuthenticatedEvidenceRoute
   AuthenticatedFaqRoute: typeof AuthenticatedFaqRoute
   AuthenticatedFollowingMeRoute: typeof AuthenticatedFollowingMeRoute
   AuthenticatedHarassmentRoute: typeof AuthenticatedHarassmentRoute
@@ -625,6 +645,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContactsRoute: AuthenticatedContactsRoute,
   AuthenticatedCyberSafetyRoute: AuthenticatedCyberSafetyRoute,
   AuthenticatedDomesticViolenceRoute: AuthenticatedDomesticViolenceRoute,
+  AuthenticatedEvidenceRoute: AuthenticatedEvidenceRoute,
   AuthenticatedFaqRoute: AuthenticatedFaqRoute,
   AuthenticatedFollowingMeRoute: AuthenticatedFollowingMeRoute,
   AuthenticatedHarassmentRoute: AuthenticatedHarassmentRoute,
