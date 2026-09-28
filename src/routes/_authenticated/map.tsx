@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { AppHeader } from "@/components/app/AppHeader";
 import { LocationPermissionGate } from "@/components/app/LocationPermissionGate";
 import {
-  MapPin, Navigation, Phone, RefreshCw, Search, Filter, Loader2, AlertTriangle, WifiOff,
+  MapPin, Navigation, Phone, RefreshCw, Search, Filter, Loader2, AlertTriangle, WifiOff, Map as MapIcon, Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatAccuracy } from "@/lib/geo";
@@ -12,9 +12,32 @@ import { cacheGet, cacheSet } from "@/lib/offline-cache";
 
 
 export const Route = createFileRoute("/_authenticated/map")({
-  head: () => ({ meta: [{ title: "Safe Places Nearby — Abhaya" }] }),
+  head: () => ({
+    meta: [
+      { title: "Safe Places Nearby — Abhaya" },
+      { name: "description", content: "Find the nearest police stations, hospitals and other safe places with distance, directions and one-tap calling." },
+      { property: "og:title", content: "Safe Places Nearby — Abhaya" },
+      { property: "og:description", content: "Nearest police, hospitals and safe places around you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: MapPage,
 });
+
+function osmEmbed(p: { lat: number; lng: number }) {
+  const d = 0.008;
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - d},${p.lat - d},${p.lng + d},${p.lat + d}&layer=mapnik&marker=${p.lat},${p.lng}`;
+}
+
+async function sharePlace(name: string, url: string) {
+  const text = `Safe place: ${name}\n${url}`;
+  try {
+    if (navigator.share) { await navigator.share({ title: name, text, url }); return; }
+    await navigator.clipboard.writeText(text);
+    toast.success("Link copied");
+  } catch { /* user cancelled */ }
+}
 
 type Category =
   | "police" | "women_police" | "hospital" | "gov_hospital" | "fire" | "bus" | "railway"
@@ -379,6 +402,17 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
     return list;
   }, [places, category, query, sosActive]);
 
+  const [focus, setFocus] = useState<Place | null>(null);
+  const nearestHelp = useMemo(() => {
+    const nearest = (cats: Category[]) =>
+      places.filter((p) => cats.includes(p.category)).sort((a, b) => a.distanceKm - b.distanceKm)[0] ?? null;
+    return [
+      { label: "police", place: nearest(["police", "women_police"]) },
+      { label: "hospital", place: nearest(["hospital", "gov_hospital"]) },
+    ];
+  }, [places]);
+
+
   const categories: (Category | "all")[] = [
     "all", "police", "women_police", "hospital", "gov_hospital", "fire", "pharmacy",
     "bus", "railway", "petrol", "atm", "bank", "hotel", "mall", "temple",
@@ -483,6 +517,47 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
         </div>
       )}
 
+      {!loading && places.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          {nearestHelp.map(({ label, place }) => (
+            <button
+              key={label}
+              onClick={() => place && setFocus(place)}
+              disabled={!place}
+              className="rounded-2xl bg-surface p-3 text-left shadow-card ring-1 ring-border/60 disabled:opacity-60"
+            >
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Nearest {label}</div>
+              {place ? (
+                <>
+                  <div className="truncate text-sm font-semibold">{place.name}</div>
+                  <div className="text-xs text-brand">{place.distanceKm < 1 ? `${Math.round(place.distanceKm * 1000)} m` : `${place.distanceKm.toFixed(1)} km`}</div>
+                </>
+              ) : (
+                <div className="text-xs text-muted-foreground">None within {radiusKm} km</div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!loading && places.length > 0 && (
+        <div className="overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60">
+          <iframe
+            title="Map of the selected place"
+            className="h-56 w-full border-0"
+            loading="lazy"
+            src={osmEmbed(focus ?? { lat: pos.lat, lng: pos.lng })}
+          />
+          <div className="flex items-center justify-between gap-2 bg-surface px-3 py-2 text-xs">
+            <span className="truncate">{focus ? focus.name : "Your location"}</span>
+            {focus && (
+              <a className="shrink-0 font-semibold text-brand" target="_blank" rel="noreferrer"
+                href={`https://www.google.com/maps/dir/?api=1&destination=${focus.lat},${focus.lng}`}>Navigate</a>
+            )}
+          </div>
+        </div>
+      )}
+
       {!loading && filtered.length > 0 && (
         <ul className="space-y-3">
           {filtered.map((p) => {
@@ -532,8 +607,11 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
                           <Phone className="h-4 w-4" /> No number
                         </Button>
                       )}
-                      <Button asChild variant="ghost" size="sm">
-                        <a href={gmapsView} target="_blank" rel="noreferrer">Open in Maps</a>
+                      <Button variant="outline" size="sm" onClick={() => setFocus(p)}>
+                        <MapIcon className="h-4 w-4" /> Show on map
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => sharePlace(p.name, gmapsView)}>
+                        <Share2 className="h-4 w-4" /> Share
                       </Button>
                     </div>
                   </div>
