@@ -104,7 +104,7 @@ function EvidenceVaultPage() {
 
   return (
     <div className="min-h-screen pb-28">
-      <AppHeader title="Evidence Vault" />
+      <AppHeader title="Evidence Vault" back="/home" />
       <main className="mx-auto max-w-2xl space-y-4 px-4 pt-4">
         <div className="flex items-start gap-3 rounded-2xl border bg-card p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
