@@ -1,3 +1,8 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Logs
 logs
 *.log
@@ -7,14 +12,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
 .output
 .vinxi
 .tanstack/**
 .nitro
-*.local
 
 # Wrangler / Cloudflare
 .wrangler/
