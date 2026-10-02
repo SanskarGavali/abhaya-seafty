@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { formatAccuracy } from "@/lib/geo";
 import { toast } from "sonner";
 import { cacheGet, cacheSet } from "@/lib/offline-cache";
+import { MySafePlaces } from "@/components/app/MySafePlaces";
 
 
 export const Route = createFileRoute("/_authenticated/map")({
@@ -402,7 +403,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
     return list;
   }, [places, category, query, sosActive]);
 
-  const [focus, setFocus] = useState<Place | null>(null);
+  const [focus, setFocus] = useState<{ name: string; lat: number; lng: number } | null>(null);
   const nearestHelp = useMemo(() => {
     const nearest = (cats: Category[]) =>
       places.filter((p) => cats.includes(p.category)).sort((a, b) => a.distanceKm - b.distanceKm)[0] ?? null;
@@ -451,6 +452,15 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
           </Button>
         </div>
       </div>
+
+      <MySafePlaces
+        pos={pos}
+        onShowOnMap={(p) => {
+          setFocus(p);
+          setTimeout(() => document.getElementById("safe-places-map")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+        }}
+      />
+
 
       {/* Search + radius */}
       <div className="relative">
@@ -540,8 +550,8 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
         </div>
       )}
 
-      {!loading && places.length > 0 && (
-        <div className="overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60">
+      {(focus || (!loading && places.length > 0)) && (
+        <div id="safe-places-map" className="overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60">
           <iframe
             title="Map of the selected place"
             className="h-56 w-full border-0"
