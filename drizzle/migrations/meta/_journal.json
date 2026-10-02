@@ -8,6 +8,13 @@
       "when": 1790477933220,
       "tag": "0000_evidence_vault_and_incident_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790917588600,
+      "tag": "0001_custom_safe_places",
+      "breakpoints": true
     }
   ]
 }

@@ -73,6 +73,45 @@ export type Database = {
           },
         ]
       }
+      custom_safe_places: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          kind: string
+          lat: number
+          lng: number
+          name: string
+          notes: string | null
+          phone: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          lat: number
+          lng: number
+          name: string
+          notes?: string | null
+          phone?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          lat?: number
+          lng?: number
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           created_at: string
