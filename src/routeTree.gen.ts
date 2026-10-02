@@ -9,50 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as LanguageRouteImport } from './routes/language'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedZeroFirRouteImport } from './routes/_authenticated/zero-fir'
-import { Route as AuthenticatedVideoEvidenceRouteImport } from './routes/_authenticated/video-evidence'
-import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/sos'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedSchemesRouteImport } from './routes/_authenticated/schemes'
-import { Route as AuthenticatedRightsRouteImport } from './routes/_authenticated/rights'
-import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
-import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
-import { Route as AuthenticatedLiveLocationRouteImport } from './routes/_authenticated/live-location'
-import { Route as AuthenticatedLearnRouteImport } from './routes/_authenticated/learn'
-import { Route as AuthenticatedIncidentsRouteImport } from './routes/_authenticated/incidents'
-import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
-import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticated/helpline'
-import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
-import { Route as AuthenticatedFollowingMeRouteImport } from './routes/_authenticated/following-me'
-import { Route as AuthenticatedFaqRouteImport } from './routes/_authenticated/faq'
-import { Route as AuthenticatedEvidenceRouteImport } from './routes/_authenticated/evidence'
-import { Route as AuthenticatedDomesticViolenceRouteImport } from './routes/_authenticated/domestic-violence'
-import { Route as AuthenticatedCyberSafetyRouteImport } from './routes/_authenticated/cyber-safety'
-import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
-import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LanguageRouteImport } from './routes/language'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
+import { Route as AuthenticatedContactsRouteImport } from './routes/_authenticated/contacts'
+import { Route as AuthenticatedCyberSafetyRouteImport } from './routes/_authenticated/cyber-safety'
+import { Route as AuthenticatedDomesticViolenceRouteImport } from './routes/_authenticated/domestic-violence'
+import { Route as AuthenticatedEvidenceRouteImport } from './routes/_authenticated/evidence'
+import { Route as AuthenticatedFaqRouteImport } from './routes/_authenticated/faq'
+import { Route as AuthenticatedFollowingMeRouteImport } from './routes/_authenticated/following-me'
+import { Route as AuthenticatedHarassmentRouteImport } from './routes/_authenticated/harassment'
+import { Route as AuthenticatedHelplineRouteImport } from './routes/_authenticated/helpline'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedIncidentsRouteImport } from './routes/_authenticated/incidents'
+import { Route as AuthenticatedLearnRouteImport } from './routes/_authenticated/learn'
+import { Route as AuthenticatedLiveLocationRouteImport } from './routes/_authenticated/live-location'
+import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
+import { Route as AuthenticatedRightsRouteImport } from './routes/_authenticated/rights'
+import { Route as AuthenticatedSchemesRouteImport } from './routes/_authenticated/schemes'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSosRouteImport } from './routes/_authenticated/sos'
+import { Route as AuthenticatedVideoEvidenceRouteImport } from './routes/_authenticated/video-evidence'
+import { Route as AuthenticatedZeroFirRouteImport } from './routes/_authenticated/zero-fir'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LanguageRoute = LanguageRouteImport.update({
-  id: '/language',
-  path: '/language',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -60,96 +54,56 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const LanguageRoute = LanguageRouteImport.update({
+  id: '/language',
+  path: '/language',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedZeroFirRoute = AuthenticatedZeroFirRouteImport.update({
-  id: '/zero-fir',
-  path: '/zero-fir',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedVideoEvidenceRoute =
-  AuthenticatedVideoEvidenceRouteImport.update({
-    id: '/video-evidence',
-    path: '/video-evidence',
+const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContactsRoute = AuthenticatedContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCyberSafetyRoute =
+  AuthenticatedCyberSafetyRouteImport.update({
+    id: '/cyber-safety',
+    path: '/cyber-safety',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
-  id: '/sos',
-  path: '/sos',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSchemesRoute = AuthenticatedSchemesRouteImport.update({
-  id: '/schemes',
-  path: '/schemes',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedRightsRoute = AuthenticatedRightsRouteImport.update({
-  id: '/rights',
-  path: '/rights',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedReportRoute = AuthenticatedReportRouteImport.update({
-  id: '/report',
-  path: '/report',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedNotificationsRoute =
-  AuthenticatedNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
+const AuthenticatedDomesticViolenceRoute =
+  AuthenticatedDomesticViolenceRouteImport.update({
+    id: '/domestic-violence',
+    path: '/domestic-violence',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
-  id: '/map',
-  path: '/map',
+const AuthenticatedEvidenceRoute = AuthenticatedEvidenceRouteImport.update({
+  id: '/evidence',
+  path: '/evidence',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedLiveLocationRoute =
-  AuthenticatedLiveLocationRouteImport.update({
-    id: '/live-location',
-    path: '/live-location',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
-  id: '/learn',
-  path: '/learn',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedIncidentsRoute = AuthenticatedIncidentsRouteImport.update({
-  id: '/incidents',
-  path: '/incidents',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedHelplineRoute = AuthenticatedHelplineRouteImport.update({
-  id: '/helpline',
-  path: '/helpline',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedHarassmentRoute = AuthenticatedHarassmentRouteImport.update({
-  id: '/harassment',
-  path: '/harassment',
+const AuthenticatedFaqRoute = AuthenticatedFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFollowingMeRoute =
@@ -158,41 +112,87 @@ const AuthenticatedFollowingMeRoute =
     path: '/following-me',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedFaqRoute = AuthenticatedFaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
+const AuthenticatedHarassmentRoute = AuthenticatedHarassmentRouteImport.update({
+  id: '/harassment',
+  path: '/harassment',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedEvidenceRoute = AuthenticatedEvidenceRouteImport.update({
-  id: '/evidence',
-  path: '/evidence',
+const AuthenticatedHelplineRoute = AuthenticatedHelplineRouteImport.update({
+  id: '/helpline',
+  path: '/helpline',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDomesticViolenceRoute =
-  AuthenticatedDomesticViolenceRouteImport.update({
-    id: '/domestic-violence',
-    path: '/domestic-violence',
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIncidentsRoute = AuthenticatedIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLearnRoute = AuthenticatedLearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLiveLocationRoute =
+  AuthenticatedLiveLocationRouteImport.update({
+    id: '/live-location',
+    path: '/live-location',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCyberSafetyRoute =
-  AuthenticatedCyberSafetyRouteImport.update({
-    id: '/cyber-safety',
-    path: '/cyber-safety',
+const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedContactsRoute = AuthenticatedContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
+const AuthenticatedReportRoute = AuthenticatedReportRouteImport.update({
+  id: '/report',
+  path: '/report',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AuthenticatedRightsRoute = AuthenticatedRightsRouteImport.update({
+  id: '/rights',
+  path: '/rights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSchemesRoute = AuthenticatedSchemesRouteImport.update({
+  id: '/schemes',
+  path: '/schemes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSosRoute = AuthenticatedSosRouteImport.update({
+  id: '/sos',
+  path: '/sos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVideoEvidenceRoute =
+  AuthenticatedVideoEvidenceRouteImport.update({
+    id: '/video-evidence',
+    path: '/video-evidence',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedZeroFirRoute = AuthenticatedZeroFirRouteImport.update({
+  id: '/zero-fir',
+  path: '/zero-fir',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
@@ -399,32 +399,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/language': {
-      id: '/language'
-      path: '/language'
-      fullPath: '/language'
-      preLoaderRoute: typeof LanguageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -434,165 +413,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/zero-fir': {
-      id: '/_authenticated/zero-fir'
-      path: '/zero-fir'
-      fullPath: '/zero-fir'
-      preLoaderRoute: typeof AuthenticatedZeroFirRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/language': {
+      id: '/language'
+      path: '/language'
+      fullPath: '/language'
+      preLoaderRoute: typeof LanguageRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/video-evidence': {
-      id: '/_authenticated/video-evidence'
-      path: '/video-evidence'
-      fullPath: '/video-evidence'
-      preLoaderRoute: typeof AuthenticatedVideoEvidenceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/sos': {
-      id: '/_authenticated/sos'
-      path: '/sos'
-      fullPath: '/sos'
-      preLoaderRoute: typeof AuthenticatedSosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/schemes': {
-      id: '/_authenticated/schemes'
-      path: '/schemes'
-      fullPath: '/schemes'
-      preLoaderRoute: typeof AuthenticatedSchemesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rights': {
-      id: '/_authenticated/rights'
-      path: '/rights'
-      fullPath: '/rights'
-      preLoaderRoute: typeof AuthenticatedRightsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/report': {
-      id: '/_authenticated/report'
-      path: '/report'
-      fullPath: '/report'
-      preLoaderRoute: typeof AuthenticatedReportRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notifications': {
-      id: '/_authenticated/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/map': {
-      id: '/_authenticated/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof AuthenticatedMapRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/live-location': {
-      id: '/_authenticated/live-location'
-      path: '/live-location'
-      fullPath: '/live-location'
-      preLoaderRoute: typeof AuthenticatedLiveLocationRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/learn': {
-      id: '/_authenticated/learn'
-      path: '/learn'
-      fullPath: '/learn'
-      preLoaderRoute: typeof AuthenticatedLearnRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/incidents': {
-      id: '/_authenticated/incidents'
-      path: '/incidents'
-      fullPath: '/incidents'
-      preLoaderRoute: typeof AuthenticatedIncidentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/home': {
-      id: '/_authenticated/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof AuthenticatedHomeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/helpline': {
-      id: '/_authenticated/helpline'
-      path: '/helpline'
-      fullPath: '/helpline'
-      preLoaderRoute: typeof AuthenticatedHelplineRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/harassment': {
-      id: '/_authenticated/harassment'
-      path: '/harassment'
-      fullPath: '/harassment'
-      preLoaderRoute: typeof AuthenticatedHarassmentRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/following-me': {
-      id: '/_authenticated/following-me'
-      path: '/following-me'
-      fullPath: '/following-me'
-      preLoaderRoute: typeof AuthenticatedFollowingMeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/faq': {
-      id: '/_authenticated/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof AuthenticatedFaqRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/evidence': {
-      id: '/_authenticated/evidence'
-      path: '/evidence'
-      fullPath: '/evidence'
-      preLoaderRoute: typeof AuthenticatedEvidenceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/domestic-violence': {
-      id: '/_authenticated/domestic-violence'
-      path: '/domestic-violence'
-      fullPath: '/domestic-violence'
-      preLoaderRoute: typeof AuthenticatedDomesticViolenceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/cyber-safety': {
-      id: '/_authenticated/cyber-safety'
-      path: '/cyber-safety'
-      fullPath: '/cyber-safety'
-      preLoaderRoute: typeof AuthenticatedCyberSafetyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/contacts': {
-      id: '/_authenticated/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof AuthenticatedContactsRouteImport
+    '/_authenticated/about': {
+      id: '/_authenticated/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AuthenticatedAboutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/assistant': {
@@ -602,11 +455,158 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssistantRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/about': {
-      id: '/_authenticated/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AuthenticatedAboutRouteImport
+    '/_authenticated/contacts': {
+      id: '/_authenticated/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AuthenticatedContactsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cyber-safety': {
+      id: '/_authenticated/cyber-safety'
+      path: '/cyber-safety'
+      fullPath: '/cyber-safety'
+      preLoaderRoute: typeof AuthenticatedCyberSafetyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/domestic-violence': {
+      id: '/_authenticated/domestic-violence'
+      path: '/domestic-violence'
+      fullPath: '/domestic-violence'
+      preLoaderRoute: typeof AuthenticatedDomesticViolenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/evidence': {
+      id: '/_authenticated/evidence'
+      path: '/evidence'
+      fullPath: '/evidence'
+      preLoaderRoute: typeof AuthenticatedEvidenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/faq': {
+      id: '/_authenticated/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof AuthenticatedFaqRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/following-me': {
+      id: '/_authenticated/following-me'
+      path: '/following-me'
+      fullPath: '/following-me'
+      preLoaderRoute: typeof AuthenticatedFollowingMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/harassment': {
+      id: '/_authenticated/harassment'
+      path: '/harassment'
+      fullPath: '/harassment'
+      preLoaderRoute: typeof AuthenticatedHarassmentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/helpline': {
+      id: '/_authenticated/helpline'
+      path: '/helpline'
+      fullPath: '/helpline'
+      preLoaderRoute: typeof AuthenticatedHelplineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/incidents': {
+      id: '/_authenticated/incidents'
+      path: '/incidents'
+      fullPath: '/incidents'
+      preLoaderRoute: typeof AuthenticatedIncidentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/learn': {
+      id: '/_authenticated/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof AuthenticatedLearnRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/live-location': {
+      id: '/_authenticated/live-location'
+      path: '/live-location'
+      fullPath: '/live-location'
+      preLoaderRoute: typeof AuthenticatedLiveLocationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/map': {
+      id: '/_authenticated/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthenticatedMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/report': {
+      id: '/_authenticated/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof AuthenticatedReportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rights': {
+      id: '/_authenticated/rights'
+      path: '/rights'
+      fullPath: '/rights'
+      preLoaderRoute: typeof AuthenticatedRightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/schemes': {
+      id: '/_authenticated/schemes'
+      path: '/schemes'
+      fullPath: '/schemes'
+      preLoaderRoute: typeof AuthenticatedSchemesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sos': {
+      id: '/_authenticated/sos'
+      path: '/sos'
+      fullPath: '/sos'
+      preLoaderRoute: typeof AuthenticatedSosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/video-evidence': {
+      id: '/_authenticated/video-evidence'
+      path: '/video-evidence'
+      fullPath: '/video-evidence'
+      preLoaderRoute: typeof AuthenticatedVideoEvidenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/zero-fir': {
+      id: '/_authenticated/zero-fir'
+      path: '/zero-fir'
+      fullPath: '/zero-fir'
+      preLoaderRoute: typeof AuthenticatedZeroFirRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
