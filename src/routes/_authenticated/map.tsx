@@ -551,7 +551,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
       )}
 
       {(focus || (!loading && places.length > 0)) && (
-        <div className="overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60">
+        <div id="safe-places-map" className="overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60">
           <iframe
             title="Map of the selected place"
             className="h-56 w-full border-0"
