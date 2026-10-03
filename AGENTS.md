@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Rules
+- Public backend values (VITE_SUPABASE_URL / PUBLISHABLE_KEY / PROJECT_ID) have a build-time fallback in vite.config.ts `define` — why: .env is git-ignored, and repo builds otherwise inline empty values and crash at startup. Only browser-safe values there; never secret keys.
