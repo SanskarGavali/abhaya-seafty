@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import logo from "@/assets/abhaya-logo.jpeg.asset.json";
+import logo from "@/assets/abhaya-approved-logo.png.asset.json";
 
 export function BrandLogo({
   size = "md",
