@@ -19,7 +19,7 @@ export function AppHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("sticky top-0 z-30 border-b border-border/60 bg-surface/90 backdrop-blur-xl", className)}>
+    <header className={cn("sticky top-0 z-30 border-b border-border/60 bg-background/55 backdrop-blur-2xl", className)}>
       <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
         <div className="flex items-center gap-2">
           {back && (
