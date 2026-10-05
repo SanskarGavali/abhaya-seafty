@@ -31,7 +31,7 @@ function HomePage() {
       <main className="mx-auto max-w-lg space-y-5 px-4 pt-4">
         {/* Greeting */}
         <section className="animate-float-up">
-          <h1 className="font-display text-2xl font-semibold">
+          <h1 className="font-display text-3xl font-semibold drop-shadow">
             {t("hello", lang)}, {name} <span className="align-middle">👋</span>
           </h1>
           <p className="text-sm text-muted-foreground">{t("stayAlert", lang)}</p>
@@ -100,7 +100,7 @@ function HomePage() {
         </Link>
 
         {/* Live-location shortcut */}
-        <Link to="/live-location" className="flex items-center justify-between rounded-3xl bg-brand-soft p-4 shadow-card">
+        <Link to="/live-location" className="flex items-center justify-between rounded-3xl bg-surface p-4 shadow-card">
           <div>
             <div className="text-sm font-semibold text-brand">Share Live Location</div>
             <div className="text-xs text-muted-foreground">Let trusted contacts see where you are, in real time.</div>

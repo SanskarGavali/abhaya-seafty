@@ -16,7 +16,7 @@ export function BottomNav() {
   const [lang] = useLanguage();
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/70 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-lg items-stretch justify-between px-2">
         {items.map(({ to, icon: Icon, key }) => {
           const active = path === to || path.startsWith(to + "/");
@@ -26,10 +26,10 @@ export function BottomNav() {
               to={to}
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 px-2 py-2.5 text-[11px] font-medium transition-colors",
-                active ? "text-brand" : "text-muted-foreground",
+                active ? "text-brand-pink" : "text-muted-foreground",
               )}
             >
-              <div className={cn("flex h-9 w-9 items-center justify-center rounded-full transition-all", active && "bg-brand-soft")}>
+              <div className={cn("flex h-9 w-9 items-center justify-center rounded-full transition-all", active && "bg-gradient-brand text-brand-foreground shadow-glow")}>
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
               </div>
               <span>{t(key, lang)}</span>
