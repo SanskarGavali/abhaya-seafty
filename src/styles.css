@@ -182,9 +182,6 @@
 
 /* Reference-matched presentation, confined to these two existing screens. */
 .safety-screen, .safe-place-dialog {
-  position: relative;
-  isolation: isolate;
-  min-height: 100svh;
   --foreground: var(--safety-ink);
   --muted-foreground: var(--safety-muted);
   --surface: var(--safety-panel);
@@ -195,6 +192,7 @@
   --shadow-card: var(--shadow-safety);
   color: var(--foreground);
 }
+.safety-screen { position: relative; isolation: isolate; min-height: 100svh; }
 .safe-place-dialog { min-height: auto; background: var(--safety-panel); border-radius: 1rem; box-shadow: var(--shadow-safety); }
 .safe-place-dialog h2 { font-family: var(--font-sans); letter-spacing: 0; }
 .safe-place-dialog input, .safe-place-dialog textarea { background: var(--safety-panel-hover); }
