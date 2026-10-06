@@ -94,7 +94,7 @@ export function MySafePlaces({
     .sort((a, b) => a.km - b.km);
 
   return (
-    <section className="space-y-3 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+    <section className="my-safe-places space-y-3 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
