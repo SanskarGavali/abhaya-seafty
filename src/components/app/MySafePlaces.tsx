@@ -257,7 +257,7 @@ function AddPlaceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="safe-place-dialog max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add a safe place</DialogTitle>
           <DialogDescription>Save a place you trust so you can find it quickly in an emergency.</DialogDescription>

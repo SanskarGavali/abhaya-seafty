@@ -181,7 +181,7 @@
 }
 
 /* Reference-matched presentation, confined to these two existing screens. */
-.safety-screen {
+.safety-screen, .safe-place-dialog {
   position: relative;
   isolation: isolate;
   min-height: 100svh;
@@ -195,6 +195,9 @@
   --shadow-card: var(--shadow-safety);
   color: var(--foreground);
 }
+.safe-place-dialog { min-height: auto; background: var(--safety-panel); border-radius: 1rem; box-shadow: var(--shadow-safety); }
+.safe-place-dialog h2 { font-family: var(--font-sans); letter-spacing: 0; }
+.safe-place-dialog input, .safe-place-dialog textarea { background: var(--safety-panel-hover); }
 .safety-art {
   position: fixed;
   inset: 0;
@@ -228,6 +231,7 @@
 .safety-screen .safety-search { box-shadow: var(--shadow-safety); border-radius: 0.875rem; background: var(--safety-panel); }
 .safety-screen .filter-row { scrollbar-width: thin; scrollbar-color: var(--safety-brand) transparent; }
 .safety-screen .safety-chip { min-height: 2.25rem; padding-inline: 0.875rem; }
+.safety-screen .places-error { background: var(--safety-panel); border: 1px solid var(--safety-border); box-shadow: var(--shadow-safety); }
 .safety-screen .guidance-intro { padding: 0; color: var(--brand-foreground); text-shadow: var(--shadow-soft); }
 .safety-screen .guidance-intro p { color: var(--brand-foreground); }
 .safety-screen .emergency-help { padding: 1rem; border-radius: 1rem; background: var(--safety-panel); backdrop-filter: blur(16px); box-shadow: var(--shadow-safety); border: 1px solid var(--border); }

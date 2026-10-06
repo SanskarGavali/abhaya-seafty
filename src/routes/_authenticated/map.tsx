@@ -510,7 +510,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
 
       {/* Error banner with retry */}
       {errorMsg && !loading && (
-        <div className="space-y-2 rounded-2xl bg-emergency/10 p-3 text-sm text-emergency">
+        <div className="places-error space-y-2 rounded-2xl p-3 text-sm text-emergency">
           <div>{errorMsg}</div>
           <div className="flex gap-2">
             <Button size="sm" variant="emergency" onClick={refresh}>
