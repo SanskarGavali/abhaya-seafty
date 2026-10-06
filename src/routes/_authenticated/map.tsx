@@ -478,7 +478,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
       <div className="flex flex-wrap items-center gap-2 text-xs text-brand-foreground">
         <span>Radius:</span>
         {[2, 5, 10, 20].map((r) => (
-          <button
+          <Button variant="glass" size="sm"
             key={r}
             onClick={() => setRadiusKm(r)}
             className={`safety-chip rounded-full border font-medium transition-colors ${
