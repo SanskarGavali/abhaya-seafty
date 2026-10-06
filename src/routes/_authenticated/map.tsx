@@ -10,6 +10,7 @@ import { formatAccuracy } from "@/lib/geo";
 import { toast } from "sonner";
 import { cacheGet, cacheSet } from "@/lib/offline-cache";
 import { MySafePlaces } from "@/components/app/MySafePlaces";
+import guardianArt from "@/assets/abhaya-guardian-background.png.asset.json";
 
 
 export const Route = createFileRoute("/_authenticated/map")({
@@ -252,7 +253,8 @@ function walkMinutes(km: number): number {
 
 function MapPage() {
   return (
-    <div className="pb-24">
+    <div className="safety-screen pb-24">
+      <div className="safety-art" aria-hidden="true"><img src={guardianArt.url} alt="" decoding="async" /></div>
       <AppHeader title="Safe Places Nearby" />
       <LocationPermissionGate purpose="We use your location to show police stations, hospitals, and other safe places nearby. You can change this any time.">
         {(initialPos) => <PlacesList initialPos={initialPos} />}
@@ -435,12 +437,12 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
       )}
 
       {/* Location status */}
-      <div className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+      <div className="location-card safety-panel rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
+          <div className="safety-icon flex h-10 w-10 shrink-0 items-center justify-center">
             <MapPin className="h-5 w-5" />
           </div>
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold">Your current location</div>
             <div className="text-xs text-muted-foreground">
               {pos.lat.toFixed(4)}, {pos.lng.toFixed(4)} · {formatAccuracy(pos.accuracy)}
@@ -469,46 +471,46 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name or area…"
-          className="w-full rounded-2xl border border-border bg-surface py-3 pl-9 pr-3 text-sm outline-none focus:border-brand"
+          className="safety-search w-full border border-border py-3 pl-9 pr-3 text-sm outline-none focus:border-brand"
         />
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-brand-foreground">
         <span>Radius:</span>
         {[2, 5, 10, 20].map((r) => (
-          <button
+          <Button variant="glass" size="sm"
             key={r}
             onClick={() => setRadiusKm(r)}
-            className={`rounded-full border px-2.5 py-1 font-medium transition-colors ${
+            className={`safety-chip rounded-full border font-medium transition-colors ${
               radiusKm === r ? "border-brand bg-brand text-brand-foreground" : "border-border bg-surface"
             }`}
-          >{r} km</button>
+          >{r} km</Button>
         ))}
       </div>
 
       {/* Category filter */}
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="filter-row -mx-4 flex gap-2 overflow-x-auto px-4 pb-2">
         {categories.map((c) => {
           const active = category === c;
           const label = c === "all" ? "All" : CATEGORY_META[c].short;
           return (
-            <button
+            <Button variant="glass" size="sm"
               key={c}
               onClick={() => setCategory(c)}
-              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`safety-chip shrink-0 rounded-full border text-xs font-medium transition-colors ${
                 active ? "border-brand bg-brand text-brand-foreground" : "border-border bg-surface text-foreground/70 hover:bg-brand-soft"
               }`}
             >
               {c === "all" && <Filter className="mr-1 inline h-3 w-3" />}
               {label}
-            </button>
+            </Button>
           );
         })}
       </div>
 
       {/* Error banner with retry */}
       {errorMsg && !loading && (
-        <div className="space-y-2 rounded-2xl bg-emergency/10 p-3 text-sm text-emergency">
+        <div className="places-error space-y-2 rounded-2xl p-3 text-sm text-emergency">
           <div>{errorMsg}</div>
           <div className="flex gap-2">
             <Button size="sm" variant="emergency" onClick={refresh}>
@@ -530,11 +532,11 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
       {!loading && places.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
           {nearestHelp.map(({ label, place }) => (
-            <button
+            <Button variant="glass"
               key={label}
               onClick={() => place && setFocus(place)}
               disabled={!place}
-              className="rounded-2xl bg-surface p-3 text-left shadow-card ring-1 ring-border/60 disabled:opacity-60"
+              className="h-auto min-h-24 flex-col items-start gap-1 whitespace-normal rounded-2xl bg-surface p-3 text-left shadow-card ring-1 ring-border/60 disabled:opacity-60"
             >
               <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Nearest {label}</div>
               {place ? (
@@ -545,7 +547,7 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
               ) : (
                 <div className="text-xs text-muted-foreground">None within {radiusKm} km</div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -577,15 +579,15 @@ function PlacesList({ initialPos }: { initialPos: { lat: number; lng: number; ac
             const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
             const gmapsView = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
             return (
-              <li key={p.id} className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+              <li key={p.id} className="place-card rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
                 <div className="flex items-start gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.color}`}>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center safety-icon rounded-full bg-brand-soft text-brand`}>
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="truncate font-semibold">{p.name}</div>
+                        <div className="place-name font-semibold">{p.name}</div>
                         <div className="text-xs text-muted-foreground">{meta.label}</div>
                       </div>
                       <div className="shrink-0 text-right">

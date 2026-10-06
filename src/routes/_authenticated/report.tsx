@@ -16,9 +16,17 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import guardianArt from "@/assets/abhaya-guardian-background.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/report")({
-  head: () => ({ meta: [{ title: "Report & Guidance — Abhaya" }] }),
+  head: () => ({ meta: [
+    { title: "Report & Guidance — Abhaya" },
+    { name: "description", content: "Emergency helplines, police complaint guidance, legal rights, and evidence preservation resources from Abhaya." },
+    { property: "og:title", content: "Report & Guidance — Abhaya" },
+    { property: "og:description", content: "Emergency help and official guidance for police complaints, medical care, legal rights, and preserving evidence." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ReportPage,
 });
 
@@ -39,13 +47,13 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="overflow-hidden rounded-3xl bg-surface shadow-card ring-1 ring-border/60">
-      <button
+    <section className="guidance-section overflow-hidden rounded-3xl bg-surface shadow-card ring-1 ring-border/60">
+      <Button variant="ghost"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-brand-soft/40"
+        className="guidance-toggle flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-brand-soft/40"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+        <div className="safety-icon flex h-10 w-10 shrink-0 items-center justify-center">
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
@@ -55,8 +63,8 @@ function Section({
         <ChevronDown
           className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
         />
-      </button>
-      {open && <div className="border-t border-border/60 px-4 pb-5 pt-4 text-sm text-foreground/85">{children}</div>}
+      </Button>
+      {open && <div className="guidance-content border-t border-border/60 px-4 pb-5 pt-4 text-sm text-foreground/85">{children}</div>}
     </section>
   );
 }
@@ -136,10 +144,11 @@ const EMERGENCY_NUMBERS = [
 
 function ReportPage() {
   return (
-    <div className="pb-24">
+    <div className="safety-screen pb-24">
+      <div className="safety-art" aria-hidden="true"><img src={guardianArt.url} alt="" decoding="async" /></div>
       <AppHeader title="Report & Guidance" />
       <main className="mx-auto max-w-lg space-y-4 px-4 pt-4">
-        <div className="rounded-3xl bg-gradient-brand-soft p-5 shadow-card">
+        <div className="guidance-intro">
           <h2 className="font-display text-lg font-semibold">You have options. Here's how to use them.</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Verified guidance from official Government of India sources. Tap any section to expand.
@@ -147,9 +156,9 @@ function ReportPage() {
         </div>
 
         {/* Emergency Help — always visible */}
-        <section className="rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60">
+        <section className="emergency-help">
           <div className="mb-3 flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emergency/10 text-emergency">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emergency/10 text-emergency">
               <Phone className="h-5 w-5" />
             </div>
             <div>
@@ -162,9 +171,9 @@ function ReportPage() {
               <a
                 key={h.number}
                 href={`tel:${h.number}`}
-                className="flex flex-col rounded-2xl border border-border bg-surface p-3 transition-colors hover:bg-brand-soft"
+                className="emergency-number flex flex-col gap-0.5 border border-border p-3 transition-colors"
               >
-                <span className="text-lg font-semibold text-brand">{h.number}</span>
+                <span className="text-xl font-bold text-brand">{h.number}</span>
                 <span className="text-xs font-medium">{h.label}</span>
                 <span className="text-[11px] text-muted-foreground">{h.desc}</span>
               </a>

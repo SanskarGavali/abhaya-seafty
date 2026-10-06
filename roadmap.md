@@ -8,6 +8,7 @@
 - [ ] 7. Final testing
 
 ## ABHAYA V1.0.001 — UI/UX redesign only
+- [x] Current request: match Safe Places and Report & Guidance references; preserve all actions and verify both screens (signed-in load, mobile/desktop, controls, dialog, guidance toggles and call targets; live place provider timed out; no records changed)
 - [ ] Apply approved logo/artwork and shared visual system without backend or behavior changes
 - [ ] Restyle Home, Safe Places, and Report & Guidance to match references
 - [ ] Extend visual system to all existing screens
