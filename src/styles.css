@@ -102,6 +102,16 @@
   --shadow-glow: 0 10px 40px -10px oklch(0.68 0.25 335 / 0.6);
   --shadow-emergency: 0 10px 36px -8px oklch(0.63 0.26 10 / 0.6);
   --shadow-card: 0 8px 28px -12px oklch(0.05 0.05 300 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.08);
+  --safety-panel: oklch(0.99 0.008 330 / 0.91);
+  --safety-panel-hover: oklch(0.97 0.025 330 / 0.98);
+  --safety-ink: oklch(0.3 0.075 305);
+  --safety-muted: oklch(0.47 0.045 305);
+  --safety-brand: oklch(0.49 0.2 305);
+  --safety-border: oklch(0.85 0.07 330 / 0.65);
+  --safety-soft: oklch(0.92 0.04 320 / 0.9);
+  --safety-danger: oklch(0.49 0.2 15);
+  --safety-overlay: linear-gradient(180deg, oklch(0.87 0.065 340 / 0.16), oklch(0.49 0.12 330 / 0.28) 55%, oklch(0.23 0.065 305 / 0.64));
+  --shadow-safety: 0 6px 22px -10px oklch(0.3 0.12 325 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.8);
 }
 
 
@@ -168,4 +178,67 @@
 }
 @utility animate-float-up {
   animation: float-up 0.5s ease-out both;
+}
+
+/* Reference-matched presentation, confined to these two existing screens. */
+.safety-screen {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  --foreground: var(--safety-ink);
+  --muted-foreground: var(--safety-muted);
+  --surface: var(--safety-panel);
+  --brand: var(--safety-brand);
+  --brand-soft: var(--safety-soft);
+  --border: var(--safety-border);
+  --emergency: var(--safety-danger);
+  --shadow-card: var(--shadow-safety);
+  color: var(--foreground);
+}
+.safety-art {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  max-width: 32rem;
+  margin-inline: auto;
+  overflow: hidden;
+}
+.safety-art img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.safety-art::after { content: ""; position: absolute; inset: 0; background: var(--safety-overlay); }
+.safety-screen header { background: var(--safety-panel); border-color: var(--safety-border); }
+.safety-screen h1, .safety-screen h2, .safety-screen .font-display { font-family: var(--font-sans); letter-spacing: 0; }
+.safety-screen main { padding-top: 4.75rem; }
+.safety-screen .safety-panel, .safety-screen .bg-surface { border-radius: 1rem; }
+.safety-icon {
+  background: var(--safety-soft);
+  color: var(--safety-brand);
+  border-radius: 50%;
+}
+.safety-screen .location-card { padding: 0.875rem; }
+.safety-screen .location-card > div { align-items: center; flex-wrap: wrap; }
+.safety-screen .location-card button { padding-inline: 0.75rem; }
+.safety-screen .my-safe-places { padding: 0.875rem; }
+.safety-screen .my-safe-places > div:first-child > div:first-child { min-width: 0; }
+.safety-screen .my-safe-places > div:first-child > div:first-child > div:last-child { min-width: 0; }
+.safety-screen .my-safe-places button { white-space: normal; }
+.safety-screen .place-card { padding: 1rem; }
+.safety-screen .place-card button, .safety-screen .place-card a { padding-inline: 0.875rem; }
+.safety-screen .place-name { overflow-wrap: anywhere; }
+.safety-screen .safety-search { box-shadow: var(--shadow-safety); border-radius: 0.875rem; background: var(--safety-panel); }
+.safety-screen .filter-row { scrollbar-width: thin; scrollbar-color: var(--safety-brand) transparent; }
+.safety-screen .safety-chip { min-height: 2.25rem; padding-inline: 0.875rem; }
+.safety-screen .guidance-intro { padding: 0; color: var(--brand-foreground); text-shadow: var(--shadow-soft); }
+.safety-screen .guidance-intro p { color: var(--brand-foreground); }
+.safety-screen .emergency-help { padding: 1rem; border-radius: 1rem; background: var(--safety-panel); backdrop-filter: blur(16px); box-shadow: var(--shadow-safety); border: 1px solid var(--border); }
+.safety-screen .emergency-number { background: var(--safety-soft); border-radius: 0.75rem; min-height: 6.25rem; }
+.safety-screen .emergency-number:hover { background: var(--safety-panel-hover); }
+.safety-screen .guidance-section { border-radius: 1rem; }
+.safety-screen .guidance-toggle { height: auto; min-height: 4.5rem; white-space: normal; border-radius: 0; justify-content: flex-start; }
+.safety-screen .guidance-content { line-height: 1.7; }
+.safety-screen .guidance-content a { white-space: normal; overflow-wrap: anywhere; }
+.safety-screen .guidance-content a span { overflow: visible; white-space: normal; }
+.safety-screen .guidance-content .bg-surface { background: transparent; backdrop-filter: none; border-radius: 0.75rem; }
+@media (min-width: 640px) {
+  .safety-screen main { padding-top: 3rem; }
 }
