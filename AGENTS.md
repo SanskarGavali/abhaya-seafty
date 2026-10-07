@@ -10,5 +10,6 @@
 <!-- LOVABLE:END -->
 
 ## Rules
-- Keep Safe Places and Report visual treatments scoped to their page wrappers; preserve handlers and services so visual changes cannot alter other flows.
+- Keep reference-matched visual treatments scoped to opted-in page wrappers, with shared SafetyBackdrop artwork; preserve handlers and services so visual changes cannot alter other flows.
 - Public backend values (VITE_SUPABASE_URL / PUBLISHABLE_KEY / PROJECT_ID) have a build-time fallback in vite.config.ts `define` — why: .env is git-ignored, and repo builds otherwise inline empty values and crash at startup. Only browser-safe values there; never secret keys.
+- Render temporary user-shared places separately from nearby-provider results and personal saved places, outside the location permission gate — why: these links must be visible without fabricating proximity, safety or account records.

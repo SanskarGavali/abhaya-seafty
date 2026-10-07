@@ -1,4 +1,5 @@
 # Upgrade roadmap
+- [ ] Current request: match Home, Learn and Profile to the Safe Places visual style; display the two supplied locations temporarily for everyone without changing saved data.
 - [x] 1. Evidence Vault screen
 - [x] 2. Safe Places Nearby upgrade
 - [ ] 3. Safe Route

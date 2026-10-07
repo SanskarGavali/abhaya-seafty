@@ -180,7 +180,7 @@
   animation: float-up 0.5s ease-out both;
 }
 
-/* Reference-matched presentation, confined to these two existing screens. */
+/* Reference-matched presentation, confined to opted-in page wrappers. */
 .safety-screen, .safe-place-dialog {
   --foreground: var(--safety-ink);
   --muted-foreground: var(--safety-muted);
@@ -241,6 +241,31 @@
 .safety-screen .guidance-content a { white-space: normal; overflow-wrap: anywhere; }
 .safety-screen .guidance-content a span { overflow: visible; white-space: normal; }
 .safety-screen .guidance-content .bg-surface { background: transparent; backdrop-filter: none; border-radius: 0.75rem; }
+.safety-screen.home-screen main, .safety-screen.learn-screen main, .safety-screen.profile-screen main { padding-top: 1.5rem; padding-bottom: 2rem; }
+.safety-screen .page-intro { color: var(--brand-foreground); text-shadow: var(--shadow-soft); }
+.safety-screen .page-intro p, .safety-screen .page-intro a { color: var(--brand-foreground); }
+.safety-screen .quick-access-heading { color: var(--brand-foreground); }
+.safety-screen .quick-access-heading a { color: var(--brand-foreground); }
+.home-screen .quick-access-grid > a { min-height: 9rem; padding: 1rem 0.5rem; justify-content: center; }
+.home-screen .quick-access-grid > a > span { overflow-wrap: anywhere; }
+.home-screen .home-sos { height: auto; display: block; white-space: normal; padding: 1.25rem; border-radius: 1rem; }
+.home-screen .home-sos svg { width: 2.25rem; height: 2.25rem; }
+.home-screen .sos-disc { background: var(--safety-panel); }
+.home-screen .sos-ring { background: var(--safety-panel); }
+.home-screen .sos-tag { background: var(--safety-panel); color: var(--safety-danger); }
+.home-screen .home-shortcut > div { min-width: 0; }
+.learn-screen .learning-intro { background: none; box-shadow: none; padding: 0.25rem 0 1rem; }
+.learn-screen .learning-link { min-height: 5.5rem; }
+.learn-screen .learning-link > div:last-child { min-width: 0; }
+.profile-screen .profile-identity { background: var(--safety-panel); border: 1px solid var(--safety-border); border-radius: 1rem; }
+.profile-screen .profile-avatar { border-color: var(--safety-panel); }
+.profile-screen .profile-menu { border-radius: 1rem; background: var(--safety-panel); }
+.profile-screen .profile-menu-action { height: auto; min-height: 5.25rem; justify-content: flex-start; white-space: normal; border-radius: 0; }
+.profile-screen .profile-menu-action > div:nth-child(2) { min-width: 0; }
+.profile-screen .profile-signout { color: var(--safety-danger); border-color: var(--safety-border); }
+@media (prefers-reduced-motion: reduce) {
+  .safety-screen .animate-float-up, .safety-screen .animate-pulse-ring { animation: none; }
+}
 @media (min-width: 640px) {
   .safety-screen main { padding-top: 3rem; }
 }
