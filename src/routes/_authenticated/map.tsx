@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { cacheGet, cacheSet } from "@/lib/offline-cache";
 import { MySafePlaces } from "@/components/app/MySafePlaces";
 import guardianArt from "@/assets/abhaya-guardian-background.png.asset.json";
+import { TemporarySharedPlaces } from "@/components/app/TemporarySharedPlaces";
 
 
 export const Route = createFileRoute("/_authenticated/map")({
@@ -256,6 +257,7 @@ function MapPage() {
     <div className="safety-screen pb-24">
       <div className="safety-art" aria-hidden="true"><img src={guardianArt.url} alt="" decoding="async" /></div>
       <AppHeader title="Safe Places Nearby" />
+      <TemporarySharedPlaces />
       <LocationPermissionGate purpose="We use your location to show police stations, hospitals, and other safe places nearby. You can change this any time.">
         {(initialPos) => <PlacesList initialPos={initialPos} />}
       </LocationPermissionGate>

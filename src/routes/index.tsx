@@ -6,6 +6,14 @@ import { t } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
+  head: () => ({ meta: [
+    { title: "Abhaya — Fear Less. Live Free." },
+    { name: "description", content: "Abhaya brings emergency help, trusted contacts and practical safety guidance together." },
+    { property: "og:title", content: "Abhaya — Fear Less. Live Free." },
+    { property: "og:description", content: "Emergency help, trusted contacts and practical safety guidance." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Splash,
 });
 
