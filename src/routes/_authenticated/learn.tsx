@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppHeader } from "@/components/app/AppHeader";
 import { BookOpen, Scale, Shield, HandHeart, FileText, HelpCircle, Landmark, MapPin } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { SafetyBackdrop } from "@/components/app/SafetyBackdrop";
 
 const items: { to: string; icon: LucideIcon; title: string; desc: string }[] = [
   { to: "/rights", icon: Scale, title: "Women's Rights", desc: "DV Act, POSH, BNS/BNSS/BSA, POCSO, IT Act." },
@@ -15,16 +16,24 @@ const items: { to: string; icon: LucideIcon; title: string; desc: string }[] = [
 ];
 
 export const Route = createFileRoute("/_authenticated/learn")({
-  head: () => ({ meta: [{ title: "Learning Centre — Abhaya" }] }),
+  head: () => ({ meta: [
+    { title: "Learning Centre — Abhaya" },
+    { name: "description", content: "Explore women's rights, safety guidance and practical support options in India." },
+    { property: "og:title", content: "Learning Centre — Abhaya" },
+    { property: "og:description", content: "Women's rights and practical safety guidance in India." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: LearnPage,
 });
 
 function LearnPage() {
   return (
-    <div>
+    <div className="safety-screen learn-screen">
+      <SafetyBackdrop />
       <AppHeader title="Learning Centre" />
       <main className="mx-auto max-w-lg space-y-3 px-4 pt-4 pb-8">
-        <div className="rounded-3xl bg-gradient-brand-soft p-5 shadow-card">
+        <div className="learning-intro page-intro">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow">
               <BookOpen className="h-5 w-5" />
@@ -37,8 +46,8 @@ function LearnPage() {
         </div>
 
         {items.map(({ to, icon: Icon, title, desc }) => (
-          <Link key={to} to={to as never} className="flex items-center gap-4 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60 hover:bg-brand-soft/40">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-brand text-brand-foreground shadow-soft">
+          <Link key={to} to={to as never} className="learning-link flex items-center gap-4 rounded-3xl bg-surface p-4 shadow-card ring-1 ring-border/60 hover:bg-brand-soft/40">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-brand-foreground shadow-soft">
               <Icon className="h-6 w-6" />
             </div>
             <div className="flex-1">

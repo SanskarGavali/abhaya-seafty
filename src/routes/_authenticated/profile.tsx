@@ -9,9 +9,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/use-language";
 import { t } from "@/lib/i18n";
 import { isInstallAvailable, isStandalone, onInstallAvailabilityChange, promptInstall } from "@/lib/pwa-install";
+import { SafetyBackdrop } from "@/components/app/SafetyBackdrop";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "Profile — Abhaya" }] }),
+  head: () => ({ meta: [
+    { title: "Profile — Abhaya" },
+    { name: "description", content: "Manage your Abhaya profile, emergency contacts, preferences and app installation." },
+    { property: "og:title", content: "Profile — Abhaya" },
+    { property: "og:description", content: "Your Abhaya profile, contacts and preferences." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ProfilePage,
 });
 
@@ -57,12 +66,13 @@ function ProfilePage() {
   const initial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
   return (
-    <div>
+    <div className="safety-screen profile-screen">
+      <SafetyBackdrop />
       <AppHeader title={t("profile", lang)} />
       <main className="mx-auto max-w-lg space-y-4 px-4 pt-6">
-        <section className="rounded-3xl bg-gradient-brand-soft p-6 shadow-card">
+        <section className="profile-identity p-6 shadow-card">
           <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-white shadow-glow">
+            <Avatar className="profile-avatar h-16 w-16 shrink-0 border-2 shadow-glow">
               <AvatarFallback className="bg-gradient-brand text-lg font-semibold text-brand-foreground">{initial}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
@@ -72,7 +82,7 @@ function ProfilePage() {
           </div>
         </section>
 
-        <nav className="overflow-hidden rounded-3xl bg-surface shadow-card">
+        <nav className="profile-menu overflow-hidden shadow-card">
           {[
             { to: "/contacts" as const, icon: Phone, label: "Emergency Contacts", desc: "Manage priority contacts" },
             { to: "/settings" as const, icon: SettingsIcon, label: t("settings", lang), desc: "Language, alerts, privacy" },
@@ -90,9 +100,9 @@ function ProfilePage() {
             </Link>
           ))}
 
-          <button
+          <Button variant="ghost"
             onClick={handleInstall}
-            className="flex w-full items-center gap-4 border-b border-border/60 px-4 py-4 text-left hover:bg-brand-soft/40"
+            className="profile-menu-action flex w-full items-center gap-4 border-b border-border/60 px-4 py-4 text-left hover:bg-brand-soft/40"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-brand-foreground shadow-glow">
               <Download className="h-5 w-5" />
@@ -104,7 +114,7 @@ function ProfilePage() {
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </button>
+          </Button>
 
           <Link to="/about" className="flex items-center gap-4 px-4 py-4 hover:bg-brand-soft/40">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
@@ -125,12 +135,12 @@ function ProfilePage() {
           </div>
         </div>
 
-        <button
+        <Button variant="outline"
           onClick={handleSignOut}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-destructive/30 bg-surface px-6 py-3 text-sm font-medium text-destructive hover:bg-destructive/10"
+          className="profile-signout flex w-full items-center justify-center gap-2 px-6 py-3 text-sm font-medium hover:bg-destructive/10"
         >
           <LogOut className="h-4 w-4" /> {t("logout", lang)}
-        </button>
+        </Button>
       </main>
     </div>
   );

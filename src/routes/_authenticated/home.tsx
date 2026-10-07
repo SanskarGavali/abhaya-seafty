@@ -7,9 +7,17 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/hooks/use-language";
 import { t } from "@/lib/i18n";
+import { SafetyBackdrop } from "@/components/app/SafetyBackdrop";
 
 export const Route = createFileRoute("/_authenticated/home")({
-  head: () => ({ meta: [{ title: "Home — Abhaya" }] }),
+  head: () => ({ meta: [
+    { title: "Home — Abhaya" },
+    { name: "description", content: "Your Abhaya safety essentials, emergency help and trusted contacts." },
+    { property: "og:title", content: "Home — Abhaya" },
+    { property: "og:description", content: "Your safety essentials and emergency help in Abhaya." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: HomePage,
 });
 
@@ -26,11 +34,12 @@ function HomePage() {
   }, []);
 
   return (
-    <div>
+    <div className="safety-screen home-screen">
+      <SafetyBackdrop />
       <AppHeader showLogo />
       <main className="mx-auto max-w-lg space-y-5 px-4 pt-4">
         {/* Greeting */}
-        <section className="animate-float-up">
+        <section className="page-intro animate-float-up">
           <h1 className="font-display text-3xl font-semibold drop-shadow">
             {t("hello", lang)}, {name} <span className="align-middle">👋</span>
           </h1>
@@ -38,11 +47,10 @@ function HomePage() {
         </section>
 
         {/* SOS card */}
-        <button
+        <Button variant="emergency"
           onClick={() => navigate({ to: "/sos" })}
-          className="animate-float-up group relative w-full overflow-hidden rounded-3xl bg-gradient-emergency p-5 text-left text-emergency-foreground shadow-emergency"
+          className="home-sos animate-float-up group relative w-full overflow-hidden text-left"
         >
-          <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider opacity-90">{t("emergencySos", lang)}</div>
@@ -50,25 +58,25 @@ function HomePage() {
               <div className="mt-1 text-sm opacity-90">{t("tapToAlert", lang)}</div>
             </div>
             <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
-              <span className="absolute inset-0 animate-pulse-ring rounded-full bg-white/40" />
-              <span className="absolute inset-0 animate-pulse-ring rounded-full bg-white/30" style={{ animationDelay: "0.6s" }} />
-              <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/95 text-emergency shadow-xl">
+              <span className="sos-ring absolute inset-0 animate-pulse-ring rounded-full opacity-40" />
+              <span className="sos-ring absolute inset-0 animate-pulse-ring rounded-full opacity-30" style={{ animationDelay: "0.6s" }} />
+              <span className="sos-disc relative flex h-20 w-20 items-center justify-center rounded-full text-emergency shadow-xl">
                 <AlertTriangle className="h-9 w-9" strokeWidth={2.6} />
               </span>
             </div>
           </div>
-          <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-medium">
+          <div className="sos-tag mt-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium">
             SOS <ChevronRight className="h-3 w-3" />
           </div>
-        </button>
+        </Button>
 
         {/* Quick access */}
         <section>
-          <div className="mb-3 flex items-center justify-between">
+          <div className="quick-access-heading mb-3 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold">{t("quickAccess", lang)}</h2>
             <Link to="/learn" className="text-xs font-medium text-brand hover:underline">{t("viewAll", lang)}</Link>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="quick-access-grid grid grid-cols-3 gap-3">
             <TileCard to="/following-me" icon={HomeIcon} label={t("followingMe", lang)} tone="brand" />
             <TileCard to="/domestic-violence" icon={ShieldAlert} label={t("domesticViolence", lang)} tone="pink" />
             <TileCard to="/harassment" icon={Hand} label={t("harassment", lang)} tone="emergency" />
@@ -100,7 +108,7 @@ function HomePage() {
         </Link>
 
         {/* Live-location shortcut */}
-        <Link to="/live-location" className="flex items-center justify-between rounded-3xl bg-surface p-4 shadow-card">
+        <Link to="/live-location" className="home-shortcut flex items-center justify-between gap-3 rounded-3xl bg-surface p-4 shadow-card">
           <div>
             <div className="text-sm font-semibold text-brand">Share Live Location</div>
             <div className="text-xs text-muted-foreground">Let trusted contacts see where you are, in real time.</div>
